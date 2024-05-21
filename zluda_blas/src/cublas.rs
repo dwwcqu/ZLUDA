@@ -479,7 +479,7 @@ pub unsafe extern "system" fn cublasGetStream_v2(
     handle: cublasHandle_t,
     streamId: *mut cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_stream(handle, streamId)
 }
 
 #[no_mangle]
@@ -503,7 +503,7 @@ pub unsafe extern "system" fn cublasGetAtomicsMode(
     handle: cublasHandle_t,
     mode: *mut cublasAtomicsMode_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_atomics_mode(handle, mode)
 }
 
 #[no_mangle]
@@ -511,7 +511,7 @@ pub unsafe extern "system" fn cublasSetAtomicsMode(
     handle: cublasHandle_t,
     mode: cublasAtomicsMode_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_atomics_mode(handle, mode)
 }
 
 #[no_mangle]
@@ -1218,7 +1218,7 @@ pub unsafe extern "system" fn cublasIdamin_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::idamin_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -4151,7 +4151,7 @@ pub unsafe extern "system" fn cublasSgeam(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgeam(handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc)
 }
 
 #[no_mangle]

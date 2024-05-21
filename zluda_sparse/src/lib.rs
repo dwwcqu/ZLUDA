@@ -109,6 +109,26 @@ fn index_base(index_base: cusparseIndexBase_t) -> rocsparse_index_base {
     }
 }
 
+fn solve_policy(policy: cusparseSolvePolicy_t) -> rocsparse_solve_policy {
+    match policy {
+        cusparseSolvePolicy_t::CUSPARSE_SOLVE_POLICY_NO_LEVEL => {
+            rocsparse_solve_policy::rocsparse_solve_policy_auto
+        }
+        cusparseSolvePolicy_t::CUSPARSE_SOLVE_POLICY_USE_LEVEL => {
+            rocsparse_solve_policy::rocsparse_solve_policy_auto
+        }
+        _ => panic!(),
+    }
+}
+
+fn order_convert(order: cusparseOrder_t) -> rocsparse_order {
+    match order {
+        cusparseOrder_t::CUSPARSE_ORDER_COL => rocsparse_order::rocsparse_order_column,
+        cusparseOrder_t::CUSPARSE_ORDER_ROW => rocsparse_order::rocsparse_order_row,
+        _ => panic!(),
+    }
+}
+
 unsafe fn create_csrsv2_info(info: *mut *mut csrsv2Info) -> cusparseStatus_t {
     to_cuda(rocsparse_create_mat_info(info.cast()))
 }
@@ -1286,4 +1306,728 @@ unsafe fn dcsrilu02(
         solve,
         p_buffer,
     ))
+}
+
+unsafe fn create_sp_vec(
+    spVecDescr: *mut cusparseSpVecDescr_t,
+    size: i64,
+    nnz: i64,
+    indices: *mut ::std::os::raw::c_void,
+    values: *mut ::std::os::raw::c_void,
+    idxType: cusparseIndexType_t,
+    idxBase: cusparseIndexBase_t,
+    valueType: cudaDataType,
+) -> cusparseStatus_t {
+    let value_type: rocsparse_datatype_ = data_type(valueType);
+    let index_type: rocsparse_indextype_ = index_type(idxType);
+    let index_base: rocsparse_index_base_ = index_base(idxBase);
+
+    to_cuda(rocsparse_create_spvec_descr(
+        spVecDescr.cast(),
+        size,
+        nnz,
+        indices,
+        values,
+        index_type,
+        index_base,
+        value_type,
+    ))
+}
+
+unsafe fn axpby(
+    handle: cusparseHandle_t,
+    alpha: *const ::std::os::raw::c_void,
+    vecX: cusparseSpVecDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    vecY: cusparseDnVecDescr_t,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_axpby(
+        handle.cast(),
+        alpha,
+        vecX.cast(),
+        beta,
+        vecY.cast(),
+    ))
+}
+
+unsafe fn destroy_sp_vec(spVecDescr: cusparseSpVecDescr_t) -> cusparseStatus_t {
+    if spVecDescr == ptr::null_mut() {
+        cusparseStatus_t::CUSPARSE_STATUS_SUCCESS
+    } else {
+        to_cuda(rocsparse_destroy_spvec_descr(spVecDescr.cast()))
+    }
+}
+
+unsafe fn create_csric02_info(info: *mut csric02Info_t) -> cusparseStatus_t {
+    to_cuda(rocsparse_create_mat_info(info.cast()))
+}
+
+unsafe fn dcsric02_buffersize(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    descrA: cusparseMatDescr_t,
+    csrSortedValA: *mut f64,
+    csrSortedRowPtrA: *const ::std::os::raw::c_int,
+    csrSortedColIndA: *const ::std::os::raw::c_int,
+    info: csric02Info_t,
+    pBufferSizeInBytes: *mut ::std::os::raw::c_int,
+) -> cusparseStatus_t {
+    if pBufferSizeInBytes.is_null() {
+        cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE
+    } else {
+        to_cuda(rocsparse_dcsric0_buffer_size(
+            handle.cast(),
+            m,
+            nnz,
+            descrA.cast(),
+            csrSortedValA,
+            csrSortedRowPtrA,
+            csrSortedColIndA,
+            info.cast(),
+            pBufferSizeInBytes.cast(),
+        ))
+    }
+}
+
+unsafe fn get_stream(
+    handle: cusparseHandle_t,
+    streamId: *mut cuda_types::CUstream,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_get_stream(handle.cast(), streamId.cast()))
+}
+
+unsafe fn dcsric02_analysis(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    descrA: cusparseMatDescr_t,
+    csrSortedValA: *const f64,
+    csrSortedRowPtrA: *const ::std::os::raw::c_int,
+    csrSortedColIndA: *const ::std::os::raw::c_int,
+    info: csric02Info_t,
+    policy: cusparseSolvePolicy_t,
+    pBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let mut status: rocsparse_status_;
+    let mut stream: hipStream_t = ptr::null_mut();
+    status = rocsparse_get_stream(handle.cast(), &mut stream);
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
+    status = rocsparse_dcsric0_analysis(
+        handle.cast(),
+        m,
+        nnz,
+        descrA.cast(),
+        csrSortedValA,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info.cast(),
+        rocsparse_analysis_policy::rocsparse_analysis_policy_force,
+        rocsparse_solve_policy::rocsparse_solve_policy_auto,
+        pBuffer,
+    );
+    hip_runtime_sys::hipStreamSynchronize(stream.cast());
+    to_cuda(status)
+}
+
+unsafe fn xcsric02_zero_pivot(
+    handle: cusparseHandle_t,
+    info: csric02Info_t,
+    position: *mut ::std::os::raw::c_int,
+) -> cusparseStatus_t {
+    let mut status: rocsparse_status_;
+    let mut stream: hipStream_t = ptr::null_mut();
+    status = rocsparse_get_stream(handle.cast(), &mut stream);
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
+    status = rocsparse_csric0_zero_pivot(handle.cast(), info.cast(), position);
+    hip_runtime_sys::hipStreamSynchronize(stream.cast());
+    to_cuda(status)
+}
+
+unsafe fn ccsric02(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    descrA: cusparseMatDescr_t,
+    csrSortedValA_valM: *mut cuComplex,
+    csrSortedRowPtrA: *const ::std::os::raw::c_int,
+    csrSortedColIndA: *const ::std::os::raw::c_int,
+    info: csric02Info_t,
+    policy: cusparseSolvePolicy_t,
+    pBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_ccsric0(
+        handle.cast(),
+        m,
+        nnz,
+        descrA.cast(),
+        csrSortedValA_valM.cast(),
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info.cast(),
+        rocsparse_solve_policy::rocsparse_solve_policy_auto,
+        pBuffer,
+    ))
+}
+
+unsafe fn dcsric02(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    descrA: cusparseMatDescr_t,
+    csrSortedValA_valM: *mut f64,
+    csrSortedRowPtrA: *const ::std::os::raw::c_int,
+    csrSortedColIndA: *const ::std::os::raw::c_int,
+    info: csric02Info_t,
+    policy: cusparseSolvePolicy_t,
+    pBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_dcsric0(
+        handle.cast(),
+        m,
+        nnz,
+        descrA.cast(),
+        csrSortedValA_valM,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info.cast(),
+        rocsparse_solve_policy::rocsparse_solve_policy_auto,
+        pBuffer,
+    ))
+}
+
+unsafe fn xcoosort_buffersize_ext(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    cooRowsA: *const ::std::os::raw::c_int,
+    cooColsA: *const ::std::os::raw::c_int,
+    pBufferSizeInBytes: *mut usize,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_coosort_buffer_size(
+        handle.cast(),
+        m,
+        n,
+        nnz,
+        cooRowsA,
+        cooColsA,
+        pBufferSizeInBytes,
+    ))
+}
+
+unsafe fn create_identity_permutation(
+    handle: cusparseHandle_t,
+    n: ::std::os::raw::c_int,
+    p: *mut ::std::os::raw::c_int,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_create_identity_permutation(handle.cast(), n, p))
+}
+
+unsafe fn xcoosort_by_row(
+    handle: cusparseHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nnz: ::std::os::raw::c_int,
+    cooRowsA: *mut ::std::os::raw::c_int,
+    cooColsA: *mut ::std::os::raw::c_int,
+    P: *mut ::std::os::raw::c_int,
+    pBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_coosort_by_row(
+        handle.cast(),
+        m,
+        n,
+        nnz,
+        cooRowsA,
+        cooColsA,
+        P,
+        pBuffer,
+    ))
+}
+
+unsafe fn gather(
+    handle: cusparseHandle_t,
+    vecY: cusparseDnVecDescr_t,
+    vecX: cusparseSpVecDescr_t,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_gather(handle.cast(), vecY.cast(), vecX.cast()))
+}
+
+unsafe fn create_dnmat(
+    dnMatDescr: *mut cusparseDnMatDescr_t,
+    rows: i64,
+    cols: i64,
+    ld: i64,
+    values: *mut ::std::os::raw::c_void,
+    valueType: cudaDataType,
+    order: cusparseOrder_t,
+) -> cusparseStatus_t {
+    let roc_data_type: rocsparse_datatype_ = data_type(valueType);
+    let roc_order: rocsparse_order_ = order_convert(order);
+    to_cuda(rocsparse_create_dnmat_descr(
+        dnMatDescr.cast(),
+        rows,
+        cols,
+        ld,
+        values,
+        roc_data_type,
+        roc_order,
+    ))
+}
+unsafe fn create_blocked_ell(
+    spMatDescr: *mut cusparseSpMatDescr_t,
+    rows: i64,
+    cols: i64,
+    ellBlockSize: i64,
+    ellCols: i64,
+    ellColInd: *mut ::std::os::raw::c_void,
+    ellValue: *mut ::std::os::raw::c_void,
+    ellIdxType: cusparseIndexType_t,
+    idxBase: cusparseIndexBase_t,
+    valueType: cudaDataType,
+) -> cusparseStatus_t {
+    let roc_data_type: rocsparse_datatype_ = data_type(valueType);
+    let roc_index_type: rocsparse_indextype_ = index_type(ellIdxType);
+    let roc_base_type: rocsparse_index_base_ = index_base(idxBase);
+
+    to_cuda(rocsparse_create_bell_descr(
+        spMatDescr.cast(),
+        rows,
+        cols,
+        rocsparse_direction::rocsparse_direction_column,
+        ellBlockSize,
+        ellCols,
+        ellColInd,
+        ellValue,
+        roc_index_type,
+        roc_base_type,
+        roc_data_type,
+    ))
+}
+
+unsafe fn dense_to_sparse_bufferSize(
+    handle: cusparseHandle_t,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    alg: cusparseDenseToSparseAlg_t,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    let roc_algo: rocsparse_dense_to_sparse_alg;
+    to_cuda(rocsparse_dense_to_sparse(
+        handle.cast(),
+        matA.cast(),
+        matB.cast(),
+        rocsparse_dense_to_sparse_alg_::rocsparse_dense_to_sparse_alg_default,
+        bufferSize,
+        ptr::null_mut(),
+    ))
+}
+
+unsafe fn dense_to_sparse_analysis(
+    handle: cusparseHandle_t,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    alg: cusparseDenseToSparseAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_dense_to_sparse(
+        handle.cast(),
+        matA.cast(),
+        matB.cast(),
+        rocsparse_dense_to_sparse_alg_::rocsparse_dense_to_sparse_alg_default,
+        ptr::null_mut(),
+        externalBuffer,
+    ))
+}
+
+unsafe fn dense_to_sparse_convert(
+    handle: cusparseHandle_t,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    alg: cusparseDenseToSparseAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let mut bufferSize: usize = 4;
+    let buffer_size: *mut usize = &mut bufferSize;
+    if externalBuffer.is_null() {
+        to_cuda(rocsparse_dense_to_sparse(
+            handle.cast(),
+            matA.cast(),
+            matB.cast(),
+            rocsparse_dense_to_sparse_alg_::rocsparse_dense_to_sparse_alg_default,
+            ptr::null_mut(),
+            externalBuffer,
+        ))
+    } else {
+        to_cuda(rocsparse_dense_to_sparse(
+            handle.cast(),
+            matA.cast(),
+            matB.cast(),
+            rocsparse_dense_to_sparse_alg_::rocsparse_dense_to_sparse_alg_default,
+            buffer_size,
+            externalBuffer,
+        ))
+    }
+}
+
+unsafe fn destroy_dn_mat(dnMatDescr: cusparseDnMatDescr_t) -> cusparseStatus_t {
+    to_cuda(rocsparse_destroy_dnmat_descr(dnMatDescr.cast()))
+}
+
+unsafe fn sgpsv_interleaved_batch_buffersize_ext(
+    handle: cusparseHandle_t,
+    algo: ::std::os::raw::c_int,
+    m: ::std::os::raw::c_int,
+    ds: *const f32,
+    dl: *const f32,
+    d: *const f32,
+    du: *const f32,
+    dw: *const f32,
+    x: *const f32,
+    batchCount: ::std::os::raw::c_int,
+    pBufferSizeInBytes: *mut usize,
+) -> cusparseStatus_t {
+    let dummy: *const f32 = 0x4 as *const ::std::os::raw::c_void as *const f32;
+    to_cuda(rocsparse_sgpsv_interleaved_batch_buffer_size(
+        handle.cast(),
+        rocsparse_gpsv_interleaved_alg_::rocsparse_gpsv_interleaved_alg_qr,
+        m,
+        dummy,
+        dummy,
+        dummy,
+        dummy,
+        dummy,
+        dummy,
+        batchCount,
+        batchCount,
+        pBufferSizeInBytes,
+    ))
+}
+
+unsafe fn spvv_buffersize(
+    handle: cusparseHandle_t,
+    opX: cusparseOperation_t,
+    vecX: cusparseSpVecDescr_t,
+    vecY: cusparseDnVecDescr_t,
+    result: *const ::std::os::raw::c_void,
+    computeType: cudaDataType,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    let op_x: rocsparse_operation_ = operation(opX);
+    let data_type: rocsparse_datatype_ = data_type(computeType);
+    to_cuda(rocsparse_spvv(
+        handle.cast(),
+        op_x,
+        vecX.cast(),
+        vecY.cast(),
+        result as *mut ::std::os::raw::c_void,
+        data_type,
+        bufferSize,
+        ptr::null_mut(),
+    ))
+}
+
+pub unsafe extern "system" fn spvv(
+    handle: cusparseHandle_t,
+    opX: cusparseOperation_t,
+    vecX: cusparseSpVecDescr_t,
+    vecY: cusparseDnVecDescr_t,
+    result: *mut ::std::os::raw::c_void,
+    computeType: cudaDataType,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let mut loc_buffsize: usize = 4;
+    let buffersize: *mut usize = &mut loc_buffsize;
+    let op_x: rocsparse_operation_ = operation(opX);
+    let data_type: rocsparse_datatype_ = data_type(computeType);
+    if externalBuffer.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    } else {
+        to_cuda(rocsparse_spvv(
+            handle.cast(),
+            op_x,
+            vecX.cast(),
+            vecY.cast(),
+            result,
+            data_type,
+            buffersize,
+            externalBuffer,
+        ))
+    }
+}
+
+unsafe fn rot(
+    handle: cusparseHandle_t,
+    c_coeff: *const ::std::os::raw::c_void,
+    s_coeff: *const ::std::os::raw::c_void,
+    vecX: cusparseSpVecDescr_t,
+    vecY: cusparseDnVecDescr_t,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_rot(
+        handle.cast(),
+        c_coeff,
+        s_coeff,
+        vecX.cast(),
+        vecY.cast(),
+    ))
+}
+
+unsafe fn scatter(
+    handle: cusparseHandle_t,
+    vecX: cusparseSpVecDescr_t,
+    vecY: cusparseDnVecDescr_t,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_scatter(handle.cast(), vecX.cast(), vecY.cast()))
+}
+
+unsafe fn sddmm_buffersize(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSDDMMAlg_t,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    let op_a: rocsparse_operation_ = operation(opA);
+    let op_b: rocsparse_operation_ = operation(opB);
+    let data_type: rocsparse_datatype_ = data_type(computeType);
+    to_cuda(rocsparse_sddmm_buffer_size(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        data_type,
+        rocsparse_sddmm_alg_::rocsparse_sddmm_alg_default,
+        bufferSize,
+    ))
+}
+
+unsafe fn sddmm_preprocess(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSDDMMAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let op_a: rocsparse_operation_ = operation(opA);
+    let op_b: rocsparse_operation_ = operation(opB);
+    let data_type: rocsparse_datatype_ = data_type(computeType);
+    to_cuda(rocsparse_sddmm_preprocess(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        data_type,
+        rocsparse_sddmm_alg_::rocsparse_sddmm_alg_default,
+        externalBuffer,
+    ))
+}
+
+pub unsafe extern "system" fn sddmm(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseDnMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSDDMMAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let op_a: rocsparse_operation_ = operation(opA);
+    let op_b: rocsparse_operation_ = operation(opB);
+    let data_type: rocsparse_datatype_ = data_type(computeType);
+    to_cuda(rocsparse_sddmm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        data_type,
+        rocsparse_sddmm_alg_::rocsparse_sddmm_alg_default,
+        externalBuffer,
+    ))
+}
+
+pub unsafe extern "system" fn dn_mat_set_strided_batch(
+    dnMatDescr: cusparseDnMatDescr_t,
+    batchCount: ::std::os::raw::c_int,
+    batchStride: i64,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_dnmat_set_strided_batch(
+        dnMatDescr.cast(),
+        batchCount,
+        batchStride,
+    ))
+}
+
+unsafe fn csr_set_strided_batch(
+    spMatDescr: cusparseSpMatDescr_t,
+    batchCount: ::std::os::raw::c_int,
+    offsetsBatchStride: i64,
+    columnsValuesBatchStride: i64,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_csr_set_strided_batch(
+        spMatDescr.cast(),
+        batchCount,
+        offsetsBatchStride,
+        columnsValuesBatchStride,
+    ))
+}
+
+unsafe fn sparse_to_dense_buffersize(
+    handle: cusparseHandle_t,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    alg: cusparseSparseToDenseAlg_t,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_sparse_to_dense(
+        handle.cast(),
+        matA.cast(),
+        matB.cast(),
+        rocsparse_sparse_to_dense_alg_::rocsparse_sparse_to_dense_alg_default,
+        bufferSize,
+        ptr::null_mut(),
+    ))
+}
+
+unsafe fn sparse_to_dense(
+    handle: cusparseHandle_t,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    alg: cusparseSparseToDenseAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_sparse_to_dense(
+        handle.cast(),
+        matA.cast(),
+        matB.cast(),
+        rocsparse_sparse_to_dense_alg_::rocsparse_sparse_to_dense_alg_default,
+        ptr::null_mut(),
+        externalBuffer,
+    ))
+}
+
+unsafe fn sp_gemm_work_estimation(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpGEMMAlg_t,
+    spgemmDescr: cusparseSpGEMMDescr_t,
+    bufferSize1: *mut usize,
+    externalBuffer1: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    if handle.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+    if alpha.is_null() || beta.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+    if matA.is_null() || matB.is_null() || matC.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+    if bufferSize1.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+
+    *bufferSize1 = 4;
+    cusparseStatus_t::CUSPARSE_STATUS_SUCCESS
+}
+
+fn make_hipComplex(x: f32, y: f32) -> rocsparse_float_complex {
+    rocsparse_float_complex { x, y }
+}
+
+unsafe fn spgemm_get_ptr(
+    mode: rocsparse_pointer_mode,
+    dataType: rocsparse_datatype,
+    ptr: *const ::std::os::raw::c_void,
+) -> *const ::std::os::raw::c_void {
+    let mut cast_ptr: *const ::std::os::raw::c_void = ptr::null_mut();
+    if mode == rocsparse_pointer_mode::rocsparse_pointer_mode_host {
+        match dataType {
+            rocsparse_datatype::rocsparse_datatype_f32_c => {
+                if *(ptr as *const f32) != 0.0f32 {
+                    cast_ptr = ptr;
+                }
+            }
+            rocsparse_datatype::rocsparse_datatype_f64_c => {
+                if *(ptr as *const f64) != 0.0f64 {
+                    cast_ptr = ptr;
+                }
+            }
+            rocsparse_datatype::rocsparse_datatype_f32_r => {
+                if *(ptr as *const rocsparse_float_complex) != make_hipComplex(0.0f32, 0.0f32) {
+                    cast_ptr = ptr;
+                }
+            }
+        }
+    } else {
+    }
+
+    cast_ptr
+}
+
+unsafe fn sp_gemm_compute(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpGEMMAlg_t,
+    spgemmDescr: cusparseSpGEMMDescr_t,
+    bufferSize2: *mut usize,
+    externalBuffer2: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    if handle.is_null() || alpha.is_null() || beta.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+
+    let mut mode: rocsparse_pointer_mode;
+    let mut status: rocsparse_status;
+    status = rocsparse_get_pointer_mode(handle.cast(), &mut mode);
+    let alpha_ptr: *const ::std::os::raw::c_void;
+    let beta_ptr: *const ::std::os::raw::c_void;
+
+    let mut data_type: rocsparse_datatype = data_type(computeType);
 }

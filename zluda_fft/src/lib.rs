@@ -251,3 +251,23 @@ unsafe fn plan_3d(plan: *mut i32, nx: i32, ny: i32, nz: i32, type_: cufftType) -
     *plan = plan_key as i32;
     result
 }
+
+unsafe fn plan_1d(
+    plan: *mut cufftHandle,
+    nx: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+) -> cufftResult {
+    let type_ = cuda_type(type_);
+    let mut hip_plan = mem::zeroed();
+    let result = to_cuda(hipfftPlan1d(&mut hip_plan, nx, type_, batch));
+    if result != cufftResult_t::CUFFT_SUCCESS {
+        return result;
+    }
+    let plan_key = {
+        let mut plans = PLANS.lock().unwrap();
+        plans.insert(Plan(hip_plan))
+    };
+    *plan = plan_key as i32;
+    result
+}

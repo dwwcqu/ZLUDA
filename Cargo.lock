@@ -845,10 +845,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hipblaslt-sys"
-version = "0.0.0"
-
-[[package]]
 name = "hipfft-sys"
 version = "0.0.0"
 
@@ -2386,16 +2382,6 @@ dependencies = [
  "hip_common",
  "rocblas-sys",
  "rocsolver-sys",
- "zluda_dark_api",
-]
-
-[[package]]
-name = "zluda_blaslt"
-version = "0.0.0"
-dependencies = [
- "cuda_types",
- "hip_common",
- "hipblaslt-sys",
  "zluda_dark_api",
 ]
 

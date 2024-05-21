@@ -112,6 +112,8 @@ impl cudaDataType_t {
 #[repr(transparent)]
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct cudaDataType_t(pub ::std::os::raw::c_uint);
+use crate::sddmm_preprocess;
+
 pub use self::cudaDataType_t as cudaDataType;
 impl libraryPropertyType_t {
     pub const MAJOR_VERSION: libraryPropertyType_t = libraryPropertyType_t(0);
@@ -458,7 +460,7 @@ pub unsafe extern "system" fn cusparseGetStream(
     handle: cusparseHandle_t,
     streamId: *mut cuda_types::CUstream,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::get_stream(handle, streamId)
 }
 
 #[no_mangle]
@@ -620,7 +622,7 @@ pub unsafe extern "system" fn cusparseDestroyCsrsv2Info(info: csrsv2Info_t) -> c
 pub unsafe extern "system" fn cusparseCreateCsric02Info(
     info: *mut csric02Info_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_csric02_info(info)
 }
 
 #[no_mangle]
@@ -3478,7 +3480,7 @@ pub unsafe extern "system" fn cusparseXcsric02_zeroPivot(
     info: csric02Info_t,
     position: *mut ::std::os::raw::c_int,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::xcsric02_zero_pivot(handle, info, position)
 }
 
 #[no_mangle]
@@ -3508,7 +3510,17 @@ pub unsafe extern "system" fn cusparseDcsric02_bufferSize(
     info: csric02Info_t,
     pBufferSizeInBytes: *mut ::std::os::raw::c_int,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dcsric02_buffersize(
+        handle,
+        m,
+        nnz,
+        descrA,
+        csrSortedValA,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info,
+        pBufferSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -3630,7 +3642,18 @@ pub unsafe extern "system" fn cusparseDcsric02_analysis(
     policy: cusparseSolvePolicy_t,
     pBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dcsric02_analysis(
+        handle,
+        m,
+        nnz,
+        descrA,
+        csrSortedValA,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info,
+        policy,
+        pBuffer,
+    )
 }
 
 #[no_mangle]
@@ -3694,7 +3717,18 @@ pub unsafe extern "system" fn cusparseDcsric02(
     policy: cusparseSolvePolicy_t,
     pBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dcsric02(
+        handle,
+        m,
+        nnz,
+        descrA,
+        csrSortedValA_valM,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info,
+        policy,
+        pBuffer,
+    )
 }
 
 #[no_mangle]
@@ -3710,7 +3744,18 @@ pub unsafe extern "system" fn cusparseCcsric02(
     policy: cusparseSolvePolicy_t,
     pBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::ccsric02(
+        handle,
+        m,
+        nnz,
+        descrA,
+        csrSortedValA_valM,
+        csrSortedRowPtrA,
+        csrSortedColIndA,
+        info,
+        policy,
+        pBuffer,
+    )
 }
 
 #[no_mangle]
@@ -4512,7 +4557,19 @@ pub unsafe extern "system" fn cusparseSgpsvInterleavedBatch_bufferSizeExt(
     batchCount: ::std::os::raw::c_int,
     pBufferSizeInBytes: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sgpsv_interleaved_batch_buffersize_ext(
+        handle,
+        algo,
+        m,
+        ds,
+        dl,
+        d,
+        du,
+        dw,
+        x,
+        batchCount,
+        pBufferSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -6678,7 +6735,7 @@ pub unsafe extern "system" fn cusparseCreateIdentityPermutation(
     n: ::std::os::raw::c_int,
     p: *mut ::std::os::raw::c_int,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_identity_permutation(handle, n, p)
 }
 
 #[no_mangle]
@@ -6691,7 +6748,7 @@ pub unsafe extern "system" fn cusparseXcoosort_bufferSizeExt(
     cooColsA: *const ::std::os::raw::c_int,
     pBufferSizeInBytes: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::xcoosort_buffersize_ext(handle, m, n, nnz, cooRowsA, cooColsA, pBufferSizeInBytes)
 }
 
 #[no_mangle]
@@ -6705,7 +6762,7 @@ pub unsafe extern "system" fn cusparseXcoosortByRow(
     P: *mut ::std::os::raw::c_int,
     pBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::xcoosort_by_row(handle, m, n, nnz, cooRowsA, cooColsA, P, pBuffer)
 }
 
 #[no_mangle]
@@ -7555,14 +7612,16 @@ pub unsafe extern "system" fn cusparseCreateSpVec(
     idxBase: cusparseIndexBase_t,
     valueType: cudaDataType,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_sp_vec(
+        spVecDescr, size, nnz, indices, values, idxType, idxBase, valueType,
+    )
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusparseDestroySpVec(
     spVecDescr: cusparseSpVecDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::destroy_sp_vec(spVecDescr)
 }
 
 #[no_mangle]
@@ -7727,7 +7786,12 @@ pub unsafe extern "system" fn cusparseCsrSetStridedBatch(
     offsetsBatchStride: i64,
     columnsValuesBatchStride: i64,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::csr_set_strided_batch(
+        spMatDescr,
+        batchCount,
+        offsetsBatchStride,
+        columnsValuesBatchStride,
+    )
 }
 impl cusparseSpMatAttribute_t {
     pub const CUSPARSE_SPMAT_FILL_MODE: cusparseSpMatAttribute_t = cusparseSpMatAttribute_t(0);
@@ -7944,7 +8008,18 @@ pub unsafe extern "system" fn cusparseCreateBlockedEll(
     idxBase: cusparseIndexBase_t,
     valueType: cudaDataType,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_blocked_ell(
+        spMatDescr,
+        rows,
+        cols,
+        ellBlockSize,
+        ellCols,
+        ellColInd,
+        ellValue,
+        ellIdxType,
+        idxBase,
+        valueType,
+    )
 }
 
 #[no_mangle]
@@ -7973,14 +8048,14 @@ pub unsafe extern "system" fn cusparseCreateDnMat(
     valueType: cudaDataType,
     order: cusparseOrder_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_dnmat(dnMatDescr, rows, cols, ld, values, valueType, order)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusparseDestroyDnMat(
     dnMatDescr: cusparseDnMatDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::destroy_dn_mat(dnMatDescr)
 }
 
 #[no_mangle]
@@ -8018,7 +8093,7 @@ pub unsafe extern "system" fn cusparseDnMatSetStridedBatch(
     batchCount: ::std::os::raw::c_int,
     batchStride: i64,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dn_mat_set_strided_batch(dnMatDescr, batchCount, batchStride)
 }
 
 #[no_mangle]
@@ -8038,7 +8113,7 @@ pub unsafe extern "system" fn cusparseAxpby(
     beta: *const ::std::os::raw::c_void,
     vecY: cusparseDnVecDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::axpby(handle, alpha, vecX, beta, vecY)
 }
 
 #[no_mangle]
@@ -8047,7 +8122,7 @@ pub unsafe extern "system" fn cusparseGather(
     vecY: cusparseDnVecDescr_t,
     vecX: cusparseSpVecDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::gather(handle, vecY, vecX)
 }
 
 #[no_mangle]
@@ -8056,7 +8131,7 @@ pub unsafe extern "system" fn cusparseScatter(
     vecX: cusparseSpVecDescr_t,
     vecY: cusparseDnVecDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::scatter(handle, vecX, vecY)
 }
 
 #[no_mangle]
@@ -8067,7 +8142,7 @@ pub unsafe extern "system" fn cusparseRot(
     vecX: cusparseSpVecDescr_t,
     vecY: cusparseDnVecDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::rot(handle, c_coeff, s_coeff, vecX, vecY)
 }
 
 #[no_mangle]
@@ -8080,7 +8155,7 @@ pub unsafe extern "system" fn cusparseSpVV_bufferSize(
     computeType: cudaDataType,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spvv_buffersize(handle, opX, vecX, vecY, result, computeType, bufferSize)
 }
 
 #[no_mangle]
@@ -8093,7 +8168,7 @@ pub unsafe extern "system" fn cusparseSpVV(
     computeType: cudaDataType,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spvv(handle, opX, vecX, vecY, result, computeType, externalBuffer)
 }
 impl cusparseSparseToDenseAlg_t {
     pub const CUSPARSE_SPARSETODENSE_ALG_DEFAULT: cusparseSparseToDenseAlg_t =
@@ -8111,7 +8186,7 @@ pub unsafe extern "system" fn cusparseSparseToDense_bufferSize(
     alg: cusparseSparseToDenseAlg_t,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sparse_to_dense_buffersize(handle, matA, matB, alg, bufferSize)
 }
 
 #[no_mangle]
@@ -8122,7 +8197,7 @@ pub unsafe extern "system" fn cusparseSparseToDense(
     alg: cusparseSparseToDenseAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sparse_to_dense(handle, matA, matB, alg, externalBuffer)
 }
 impl cusparseDenseToSparseAlg_t {
     pub const CUSPARSE_DENSETOSPARSE_ALG_DEFAULT: cusparseDenseToSparseAlg_t =
@@ -8140,7 +8215,7 @@ pub unsafe extern "system" fn cusparseDenseToSparse_bufferSize(
     alg: cusparseDenseToSparseAlg_t,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dense_to_sparse_bufferSize(handle, matA, matB, alg, bufferSize)
 }
 
 #[no_mangle]
@@ -8151,7 +8226,7 @@ pub unsafe extern "system" fn cusparseDenseToSparse_analysis(
     alg: cusparseDenseToSparseAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dense_to_sparse_analysis(handle, matA, matB, alg, externalBuffer)
 }
 
 #[no_mangle]
@@ -8162,7 +8237,7 @@ pub unsafe extern "system" fn cusparseDenseToSparse_convert(
     alg: cusparseDenseToSparseAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::dense_to_sparse_convert(handle, matA, matB, alg, externalBuffer)
 }
 impl cusparseSpMVAlg_t {
     pub const CUSPARSE_MV_ALG_DEFAULT: cusparseSpMVAlg_t = cusparseSpMVAlg_t(0);
@@ -8574,7 +8649,21 @@ pub unsafe extern "system" fn cusparseSpGEMM_workEstimation(
     bufferSize1: *mut usize,
     externalBuffer1: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sp_gemm_work_estimation(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        spgemmDescr,
+        bufferSize1,
+        externalBuffer1,
+    )
 }
 
 #[no_mangle]
@@ -8593,7 +8682,21 @@ pub unsafe extern "system" fn cusparseSpGEMM_compute(
     bufferSize2: *mut usize,
     externalBuffer2: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sp_gemm_compute(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        spgemmDescr,
+        bufferSize2,
+        externalBuffer2,
+    )
 }
 
 #[no_mangle]
@@ -8783,7 +8886,19 @@ pub unsafe extern "system" fn cusparseSDDMM_bufferSize(
     alg: cusparseSDDMMAlg_t,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sddmm_buffersize(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        bufferSize,
+    )
 }
 
 #[no_mangle]
@@ -8800,7 +8915,19 @@ pub unsafe extern "system" fn cusparseSDDMM_preprocess(
     alg: cusparseSDDMMAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sddmm_preprocess(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        externalBuffer,
+    )
 }
 
 #[no_mangle]
@@ -8817,7 +8944,19 @@ pub unsafe extern "system" fn cusparseSDDMM(
     alg: cusparseSDDMMAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sddmm(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        externalBuffer,
+    )
 }
 #[repr(C)]
 #[derive(Copy, Clone)]

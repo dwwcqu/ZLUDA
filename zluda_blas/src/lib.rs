@@ -176,6 +176,21 @@ unsafe fn set_stream(handle: cublasHandle_t, stream_id: cudaStream_t) -> cublasS
     to_cuda(rocblas_set_stream(handle as _, stream.unwrap() as _))
 }
 
+unsafe fn get_stream(handle: cublasHandle_t, stream_id: *mut cudaStream_t) -> cublasStatus_t {
+    let lib = hip_common::zluda_ext::get_cuda_library().unwrap();
+    let cu_get_export_table = lib
+        .get::<unsafe extern "C" fn(
+            ppExportTable: *mut *const ::std::os::raw::c_void,
+            pExportTableId: *const CUuuid,
+        ) -> CUresult>(b"cuGetExportTable\0")
+        .unwrap();
+    let mut export_table = ptr::null();
+    (cu_get_export_table)(&mut export_table, &zluda_dark_api::ZludaExt::GUID);
+    let zluda_ext = zluda_dark_api::ZludaExt::new(export_table);
+    let stream: Result<_, _> = zluda_ext.get_hip_stream(stream_id as _).into();
+    to_cuda(rocblas_get_stream(handle as _, stream.unwrap() as _))
+}
+
 fn set_math_mode(handle: cublasHandle_t, mode: cublasMath_t) -> cublasStatus_t {
     // llama.cpp uses CUBLAS_TF32_TENSOR_OP_MATH
     cublasStatus_t::CUBLAS_STATUS_SUCCESS
@@ -284,6 +299,16 @@ unsafe fn idamax_v2(
     result: *mut i32,
 ) -> cublasStatus_t {
     to_cuda(rocblas_idamax(handle.cast(), n, x, incx, result))
+}
+
+unsafe fn idamin_v2(
+    handle: *mut cublasContext,
+    n: i32,
+    x: *const f64,
+    incx: i32,
+    result: *mut i32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_idamin(handle.cast(), n, x, incx, result))
 }
 
 unsafe fn set_workspace(
@@ -1037,5 +1062,54 @@ unsafe fn gemm_strided_batched_ex(
         algo,
         0,
         rocblas_gemm_flags::rocblas_gemm_flags_none.0,
+    ))
+}
+
+unsafe fn get_atomics_mode(
+    handle: cublasHandle_t,
+    mode: *mut cublasAtomicsMode_t,
+) -> cublasStatus_t {
+    to_cuda(rocblas_get_atomics_mode(handle.cast(), mode.cast()))
+}
+
+unsafe fn set_atomics_mode(handle: cublasHandle_t, mode: cublasAtomicsMode_t) -> cublasStatus_t {
+    to_cuda(rocblas_set_atomics_mode(
+        handle.cast(),
+        rocblas_atomics_mode(mode.0),
+    ))
+}
+
+unsafe fn sgeam(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    beta: *const f32,
+    B: *const f32,
+    ldb: ::std::os::raw::c_int,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let op_a: rocblas_operation_ = op_from_cuda(transa);
+    let op_b: rocblas_operation_ = op_from_cuda(transb);
+
+    to_cuda(rocblas_sgeam(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        beta,
+        B,
+        ldb,
+        C,
+        ldc,
     ))
 }

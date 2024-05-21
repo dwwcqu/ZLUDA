@@ -127,7 +127,7 @@ pub unsafe extern "system" fn cufftPlan1d(
     type_: cufftType,
     batch: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::plan_1d(plan, nx, type_, batch)
 }
 
 #[no_mangle]
