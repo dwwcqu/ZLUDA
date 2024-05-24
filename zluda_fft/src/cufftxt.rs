@@ -201,7 +201,7 @@ pub unsafe extern "system" fn cufftXtSetGPUs(
     nGPUs: ::std::os::raw::c_int,
     whichGPUs: *mut ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_SUCCESS
 }
 
 #[no_mangle]

@@ -6,11 +6,21 @@ pub struct rocsparse_float_complex {
     pub x: f32,
     pub y: f32,
 }
+impl PartialEq for rocsparse_float_complex {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct rocsparse_double_complex {
     pub x: f64,
     pub y: f64,
+}
+impl PartialEq for rocsparse_double_complex {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
 }
 pub type rocsparse_int = i32;
 #[repr(C)]
@@ -400,6 +410,10 @@ impl rocsparse_datatype_ {
 impl rocsparse_datatype_ {
     #[doc = "< 64 bit floating point, complex."]
     pub const rocsparse_datatype_f64_c: rocsparse_datatype_ = rocsparse_datatype_(155);
+}
+impl rocsparse_datatype_ {
+    #[doc = "< 16 bit floating point, real, two half should be successive and aligned to 4 byte"]
+    pub const rocsparse_datatype_f16_r: rocsparse_datatype_ = rocsparse_datatype_(156);
 }
 impl rocsparse_datatype_ {
     #[doc = "<  8-bit signed integer, real"]

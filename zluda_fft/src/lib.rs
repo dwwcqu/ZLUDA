@@ -271,3 +271,20 @@ unsafe fn plan_1d(
     *plan = plan_key as i32;
     result
 }
+
+unsafe fn make_plan_1d(
+    plan: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+
+    if nx < 0 || batch < 0 {
+        return cufftResult::CUFFT_INVALID_VALUE;
+    }
+    let lengths: [usize; 1] = [nx as usize];
+    let number_of_transforms: usize = batch as usize;
+    crate::unsupported()
+}

@@ -113,6 +113,7 @@ impl cudaDataType_t {
 #[derive(Copy, Clone, Hash, PartialEq, Eq)]
 pub struct cudaDataType_t(pub ::std::os::raw::c_uint);
 use crate::sddmm_preprocess;
+use crate::spsm_solve;
 
 pub use self::cudaDataType_t as cudaDataType;
 impl libraryPropertyType_t {
@@ -422,7 +423,7 @@ pub unsafe extern "system" fn cusparseGetVersion(
     handle: cusparseHandle_t,
     version: *mut ::std::os::raw::c_int,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::get_version(handle, version)
 }
 
 #[no_mangle]
@@ -437,14 +438,74 @@ pub unsafe extern "system" fn cusparseGetProperty(
 pub unsafe extern "system" fn cusparseGetErrorName(
     status: cusparseStatus_t,
 ) -> *const ::std::os::raw::c_char {
-    b"\0".as_ptr().cast()
+    match status {
+        cusparseStatus_t::CUSPARSE_STATUS_NOT_INITIALIZED => {
+            b"cuSPARSE library not initialized\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_ALLOC_FAILED => {
+            b"Resource allocation failed inside the cuSPARSE library\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE => {
+            b"An unsupported value or parameter was passed to the function (a negative vector size, for example)\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_ARCH_MISMATCH => {
+            b"The function requires a feature absent from the device architecture\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_EXECUTION_FAILED => {
+            b"The GPU program failed to execute\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR => {
+            b"An internal cuSPARSE operation failed\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED => {
+            b"The matrix type is not supported by this function\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED => {
+            b"The operation or data type combination is currently not supported by the function\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INSUFFICIENT_RESOURCES => {
+            b"The resources for the computation, such as GPU global or shared memory, are not sufficient to complete the operation.\0".as_ptr().cast()
+        }
+        _ => panic!(),
+    }
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusparseGetErrorString(
     status: cusparseStatus_t,
 ) -> *const ::std::os::raw::c_char {
-    b"\0".as_ptr().cast()
+    match status {
+        cusparseStatus_t::CUSPARSE_STATUS_NOT_INITIALIZED => {
+            b"CUSPARSE_STATUS_NOT_INITIALIZED\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_ALLOC_FAILED => {
+            b"CUSPARSE_STATUS_ALLOC_FAILED\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE => {
+            b"CUSPARSE_STATUS_INVALID_VALUE\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_ARCH_MISMATCH => {
+            b"CUSPARSE_STATUS_ARCH_MISMATCH\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_EXECUTION_FAILED => {
+            b"CUSPARSE_STATUS_EXECUTION_FAILED\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR => {
+            b"CUSPARSE_STATUS_INTERNAL_ERROR\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED => {
+            b"CUSPARSE_STATUS_MATRIX_TYPE_NOT_SUPPORTED\0"
+                .as_ptr()
+                .cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED => {
+            b"CUSPARSE_STATUS_NOT_SUPPORTED\0".as_ptr().cast()
+        }
+        cusparseStatus_t::CUSPARSE_STATUS_INSUFFICIENT_RESOURCES => {
+            b"CUSPARSE_STATUS_INSUFFICIENT_RESOURCES\0".as_ptr().cast()
+        }
+        _ => panic!(),
+    }
 }
 
 #[no_mangle]
@@ -7776,7 +7837,7 @@ pub unsafe extern "system" fn cusparseCooSetStridedBatch(
     batchCount: ::std::os::raw::c_int,
     batchStride: i64,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::coo_set_strided_batch(spMatDescr, batchCount, batchStride)
 }
 
 #[no_mangle]
@@ -7936,7 +7997,10 @@ pub unsafe extern "system" fn cusparseCreateCoo(
     idxBase: cusparseIndexBase_t,
     valueType: cudaDataType,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::create_coo(
+        spMatDescr, rows, cols, nnz, cooRowInd, cooColInd, cooValues, cooIdxType, idxBase,
+        valueType,
+    )
 }
 
 #[no_mangle]
@@ -8445,14 +8509,14 @@ pub type cusparseSpSMDescr_t = *mut cusparseSpSMDescr;
 pub unsafe extern "system" fn cusparseSpSM_createDescr(
     descr: *mut cusparseSpSMDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spsm_create_descr(descr)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusparseSpSM_destroyDescr(
     descr: cusparseSpSMDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spsm_destroy_descr(descr)
 }
 
 #[no_mangle]
@@ -8469,7 +8533,19 @@ pub unsafe extern "system" fn cusparseSpSM_bufferSize(
     spsmDescr: cusparseSpSMDescr_t,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spsm_buffersize(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        matC,
+        computeType,
+        alg,
+        spsmDescr,
+        bufferSize,
+    )
 }
 
 #[no_mangle]
@@ -8486,7 +8562,19 @@ pub unsafe extern "system" fn cusparseSpSM_analysis(
     spsmDescr: cusparseSpSMDescr_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spsm_analysis(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        matC,
+        computeType,
+        alg,
+        spsmDescr,
+        externalBuffer,
+    )
 }
 
 #[no_mangle]
@@ -8502,7 +8590,18 @@ pub unsafe extern "system" fn cusparseSpSM_solve(
     alg: cusparseSpSMAlg_t,
     spsmDescr: cusparseSpSMDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spsm_solve(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        matC,
+        computeType,
+        alg,
+        spsmDescr,
+    )
 }
 impl cusparseSpMMAlg_t {
     pub const CUSPARSE_MM_ALG_DEFAULT: cusparseSpMMAlg_t = cusparseSpMMAlg_t(0);
@@ -8564,7 +8663,19 @@ pub unsafe extern "system" fn cusparseSpMM_bufferSize(
     alg: cusparseSpMMAlg_t,
     bufferSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spmm_buffersize(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        bufferSize,
+    )
 }
 
 #[no_mangle]
@@ -8598,8 +8709,21 @@ pub unsafe extern "system" fn cusparseSpMM(
     alg: cusparseSpMMAlg_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::spmm(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        externalBuffer,
+    )
 }
+
 impl cusparseSpGEMMAlg_t {
     pub const CUSPARSE_SPGEMM_DEFAULT: cusparseSpGEMMAlg_t = cusparseSpGEMMAlg_t(0);
 }
@@ -8713,7 +8837,19 @@ pub unsafe extern "system" fn cusparseSpGEMM_copy(
     alg: cusparseSpGEMMAlg_t,
     spgemmDescr: cusparseSpGEMMDescr_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    crate::sp_gemm_copy(
+        handle,
+        opA,
+        opB,
+        alpha,
+        matA,
+        matB,
+        beta,
+        matC,
+        computeType,
+        alg,
+        spgemmDescr,
+    )
 }
 
 #[no_mangle]
@@ -8990,7 +9126,7 @@ pub unsafe extern "system" fn cusparseSpMMOp_createPlan(
     epilogueBufferSize: usize,
     SpMMWorkspaceSize: *mut usize,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -8998,12 +9134,12 @@ pub unsafe extern "system" fn cusparseSpMMOp(
     plan: cusparseSpMMOpPlan_t,
     externalBuffer: *mut ::std::os::raw::c_void,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusparseSpMMOp_destroyPlan(
     plan: cusparseSpMMOpPlan_t,
 ) -> cusparseStatus_t {
-    crate::unsupported()
+    cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED
 }

@@ -34,6 +34,33 @@ pub(crate) fn unsupported() -> cusparseStatus_t {
 fn to_cuda(status: rocsparse_status) -> cusparseStatus_t {
     match status {
         rocsparse_status::rocsparse_status_success => cusparseStatus_t::CUSPARSE_STATUS_SUCCESS,
+        rocsparse_status::rocsparse_status_invalid_handle => {
+            cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE
+        }
+        rocsparse_status::rocsparse_status_not_implemented => {
+            cusparseStatus_t::CUSPARSE_STATUS_NOT_SUPPORTED
+        }
+        rocsparse_status::rocsparse_status_invalid_pointer => {
+            cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE
+        }
+        rocsparse_status::rocsparse_status_invalid_size => {
+            cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE
+        }
+        rocsparse_status::rocsparse_status_memory_error => {
+            cusparseStatus_t::CUSPARSE_STATUS_ALLOC_FAILED
+        }
+        rocsparse_status::rocsparse_status_internal_error => {
+            cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR
+        }
+        rocsparse_status::rocsparse_status_invalid_value => {
+            cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE
+        }
+        rocsparse_status::rocsparse_status_arch_mismatch => {
+            cusparseStatus_t::CUSPARSE_STATUS_ARCH_MISMATCH
+        }
+        rocsparse_status::rocsparse_status_zero_pivot => {
+            cusparseStatus_t::CUSPARSE_STATUS_ZERO_PIVOT
+        }
         _ => cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR,
     }
 }
@@ -60,7 +87,7 @@ unsafe fn create_csr(
     let idx_base = index_base(idx_base);
     let value_type = data_type(value_type);
     to_cuda(rocsparse_create_csr_descr(
-        descr as _,
+        descr.cast(),
         rows,
         cols,
         nnz,
@@ -84,6 +111,7 @@ fn data_type(data_type: cudaDataType_t) -> rocsparse_datatype {
         cudaDataType_t::CUDA_R_8U => rocsparse_datatype::rocsparse_datatype_u8_r,
         cudaDataType_t::CUDA_R_32I => rocsparse_datatype::rocsparse_datatype_i32_r,
         cudaDataType_t::CUDA_R_32U => rocsparse_datatype::rocsparse_datatype_u32_r,
+        cudaDataType_t::CUDA_R_16F => rocsparse_datatype::rocsparse_datatype_f16_r,
         _ => panic!(),
     }
 }
@@ -125,6 +153,48 @@ fn order_convert(order: cusparseOrder_t) -> rocsparse_order {
     match order {
         cusparseOrder_t::CUSPARSE_ORDER_COL => rocsparse_order::rocsparse_order_column,
         cusparseOrder_t::CUSPARSE_ORDER_ROW => rocsparse_order::rocsparse_order_row,
+        _ => panic!(),
+    }
+}
+
+fn spmm_algo(alg: cusparseSpMMAlg_t) -> rocsparse_spmm_alg {
+    match alg {
+        cusparseSpMMAlg_t::CUSPARSE_MM_ALG_DEFAULT => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_default
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_ALG_DEFAULT => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_default
+        }
+        cusparseSpMMAlg_t::CUSPARSE_COOMM_ALG1 => rocsparse_spmm_alg::rocsparse_spmm_alg_coo_atomic,
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_COO_ALG1 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_atomic
+        }
+        cusparseSpMMAlg_t::CUSPARSE_COOMM_ALG2 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_segmented
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_COO_ALG2 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_segmented
+        }
+        cusparseSpMMAlg_t::CUSPARSE_COOMM_ALG3 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_segmented_atomic
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_COO_ALG3 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_segmented_atomic
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_COO_ALG4 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_coo_segmented_atomic
+        }
+        cusparseSpMMAlg_t::CUSPARSE_CSRMM_ALG1 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_csr_row_split
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_CSR_ALG1 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_csr_row_split
+        }
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_CSR_ALG2 => rocsparse_spmm_alg::rocsparse_spmm_alg_csr,
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_CSR_ALG3 => rocsparse_spmm_alg::rocsparse_spmm_alg_csr,
+        cusparseSpMMAlg_t::CUSPARSE_SPMM_BLOCKED_ELL_ALG1 => {
+            rocsparse_spmm_alg::rocsparse_spmm_alg_bell
+        }
         _ => panic!(),
     }
 }
@@ -1591,7 +1661,7 @@ unsafe fn create_blocked_ell(
     idxBase: cusparseIndexBase_t,
     valueType: cudaDataType,
 ) -> cusparseStatus_t {
-    let roc_data_type: rocsparse_datatype_ = data_type(valueType);
+    let roc_data_type = data_type(valueType);
     let roc_index_type: rocsparse_indextype_ = index_type(ellIdxType);
     let roc_base_type: rocsparse_index_base_ = index_base(idxBase);
 
@@ -1970,8 +2040,12 @@ unsafe fn sp_gemm_work_estimation(
     cusparseStatus_t::CUSPARSE_STATUS_SUCCESS
 }
 
-fn make_hipComplex(x: f32, y: f32) -> rocsparse_float_complex {
+fn make_hip_floatComplex(x: f32, y: f32) -> rocsparse_float_complex {
     rocsparse_float_complex { x, y }
+}
+
+fn make_hip_doubleComplex(x: f64, y: f64) -> rocsparse_double_complex {
+    rocsparse_double_complex { x, y }
 }
 
 unsafe fn spgemm_get_ptr(
@@ -1993,14 +2067,74 @@ unsafe fn spgemm_get_ptr(
                 }
             }
             rocsparse_datatype::rocsparse_datatype_f32_r => {
-                if *(ptr as *const rocsparse_float_complex) != make_hipComplex(0.0f32, 0.0f32) {
+                if *(ptr as *const rocsparse_float_complex) != make_hip_floatComplex(0.0f32, 0.0f32)
+                {
                     cast_ptr = ptr;
                 }
             }
+            rocsparse_datatype::rocsparse_datatype_f64_r => {
+                if *(ptr as *const rocsparse_double_complex)
+                    != make_hip_doubleComplex(0.0f64, 0.0f64)
+                {
+                    cast_ptr = ptr;
+                }
+            }
+
+            _ => {}
         }
     } else {
+        match dataType {
+            rocsparse_datatype::rocsparse_datatype_f32_c => {
+                let mut host: f32 = 0.0f32;
+                hip_runtime_sys::hipMemcpy(
+                    &mut host as *mut _ as *mut c_void,
+                    ptr,
+                    std::mem::size_of::<f32>(),
+                    hip_runtime_sys::hipMemcpyKind::hipMemcpyDeviceToHost,
+                );
+                if host != 0.0f32 {
+                    cast_ptr = ptr;
+                }
+            }
+            rocsparse_datatype::rocsparse_datatype_f64_c => {
+                let mut host: f64 = 0.0f64;
+                hip_runtime_sys::hipMemcpy(
+                    &mut host as *mut _ as *mut c_void,
+                    ptr,
+                    std::mem::size_of::<f32>(),
+                    hip_runtime_sys::hipMemcpyKind::hipMemcpyDeviceToHost,
+                );
+                if host != 0.0f64 {
+                    cast_ptr = ptr;
+                }
+            }
+            rocsparse_datatype::rocsparse_datatype_f32_r => {
+                let mut host = rocsparse_float_complex { x: 0.0, y: 0.0 };
+                hip_runtime_sys::hipMemcpy(
+                    &mut host as *mut _ as *mut c_void,
+                    ptr,
+                    std::mem::size_of::<rocsparse_float_complex>(),
+                    hip_runtime_sys::hipMemcpyKind::hipMemcpyDeviceToHost,
+                );
+                if host != make_hip_floatComplex(0.0f32, 0.0f32) {
+                    cast_ptr = ptr;
+                }
+            }
+            rocsparse_datatype::rocsparse_datatype_f64_r => {
+                let mut host = rocsparse_double_complex { x: 0.0, y: 0.0 };
+                hip_runtime_sys::hipMemcpy(
+                    &mut host as *mut _ as *mut c_void,
+                    ptr,
+                    std::mem::size_of::<rocsparse_double_complex>(),
+                    hip_runtime_sys::hipMemcpyKind::hipMemcpyDeviceToHost,
+                );
+                if host != make_hip_doubleComplex(0.0f64, 0.0f64) {
+                    cast_ptr = ptr;
+                }
+            }
+            _ => {}
+        }
     }
-
     cast_ptr
 }
 
@@ -2023,11 +2157,377 @@ unsafe fn sp_gemm_compute(
         return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
     }
 
-    let mut mode: rocsparse_pointer_mode;
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+
+    let mut mode: rocsparse_pointer_mode = rocsparse_pointer_mode::rocsparse_pointer_mode_host;
     let mut status: rocsparse_status;
+
     status = rocsparse_get_pointer_mode(handle.cast(), &mut mode);
-    let alpha_ptr: *const ::std::os::raw::c_void;
-    let beta_ptr: *const ::std::os::raw::c_void;
+
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
 
     let mut data_type: rocsparse_datatype = data_type(computeType);
+    let alpha_ptr = spgemm_get_ptr(mode, data_type, alpha);
+    let beta_ptr = spgemm_get_ptr(mode, data_type, beta);
+    status = rocsparse_spgemm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha_ptr,
+        matA.cast(),
+        matB.cast(),
+        beta_ptr,
+        matC.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spgemm_alg::rocsparse_spgemm_alg_default,
+        rocsparse_spgemm_stage::rocsparse_spgemm_stage_buffer_size,
+        bufferSize2,
+        externalBuffer2,
+    );
+
+    to_cuda(status)
+}
+
+pub unsafe extern "system" fn sp_gemm_copy(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseSpMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseSpMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpGEMMAlg_t,
+    spgemmDescr: cusparseSpGEMMDescr_t,
+) -> cusparseStatus_t {
+    if handle.is_null() || alpha.is_null() || beta.is_null() {
+        return cusparseStatus_t::CUSPARSE_STATUS_INVALID_VALUE;
+    }
+
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+
+    let mut mode: rocsparse_pointer_mode = rocsparse_pointer_mode::rocsparse_pointer_mode_host;
+    let mut status: rocsparse_status;
+    let mut hipStatus: hip_runtime_sys::hipError_t;
+
+    status = rocsparse_get_pointer_mode(handle.cast(), &mut mode);
+
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
+
+    let mut data_type: rocsparse_datatype = data_type(computeType);
+    let alpha_ptr = spgemm_get_ptr(mode, data_type, alpha);
+    let beta_ptr = spgemm_get_ptr(mode, data_type, beta);
+
+    let mut bufferSize: usize = 0;
+    status = rocsparse_spgemm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spgemm_alg::rocsparse_spgemm_alg_default,
+        rocsparse_spgemm_stage::rocsparse_spgemm_stage_buffer_size,
+        &mut bufferSize,
+        ptr::null_mut(),
+    );
+
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
+
+    let mut buffer: *mut ::std::os::raw::c_void = ptr::null_mut();
+
+    hipStatus = hip_runtime_sys::hipMalloc(&mut buffer, bufferSize);
+
+    if hipStatus != hip_runtime_sys::hipError_t::hipSuccess {
+        return cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR;
+    }
+
+    status = rocsparse_spgemm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spgemm_alg::rocsparse_spgemm_alg_default,
+        rocsparse_spgemm_stage::rocsparse_spgemm_stage_compute,
+        &mut bufferSize,
+        buffer,
+    );
+
+    hipStatus = hip_runtime_sys::hipFree(buffer);
+    if hipStatus != hip_runtime_sys::hipError_t::hipSuccess {
+        return cusparseStatus_t::CUSPARSE_STATUS_INTERNAL_ERROR;
+    }
+
+    to_cuda(status)
+}
+
+unsafe fn spmm_buffersize(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseDnMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpMMAlg_t,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+    let dataType = data_type(computeType);
+
+    to_cuda(rocsparse_spmm_ex(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        dataType,
+        spmm_algo(alg),
+        rocsparse_spmm_stage::rocsparse_spmm_stage_buffer_size,
+        bufferSize,
+        ptr::null_mut(),
+    ))
+}
+
+unsafe fn spmm(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    beta: *const ::std::os::raw::c_void,
+    matC: cusparseDnMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpMMAlg_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+    let dataType = data_type(computeType);
+    let mut bufferSize: usize = 4;
+
+    to_cuda(rocsparse_spmm_ex(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        beta,
+        matC.cast(),
+        dataType,
+        spmm_algo(alg),
+        rocsparse_spmm_stage::rocsparse_spmm_stage_compute,
+        &mut bufferSize,
+        externalBuffer,
+    ))
+}
+
+unsafe fn create_coo(
+    spMatDescr: *mut cusparseSpMatDescr_t,
+    rows: i64,
+    cols: i64,
+    nnz: i64,
+    cooRowInd: *mut ::std::os::raw::c_void,
+    cooColInd: *mut ::std::os::raw::c_void,
+    cooValues: *mut ::std::os::raw::c_void,
+    cooIdxType: cusparseIndexType_t,
+    idxBase: cusparseIndexBase_t,
+    valueType: cudaDataType,
+) -> cusparseStatus_t {
+    let indexType = index_type(cooIdxType);
+    let indexBase = index_base(idxBase);
+    let dataType = data_type(valueType);
+
+    to_cuda(rocsparse_create_coo_descr(
+        spMatDescr.cast(),
+        rows,
+        cols,
+        nnz,
+        cooRowInd,
+        cooColInd,
+        cooValues,
+        indexType,
+        indexBase,
+        dataType,
+    ))
+}
+
+unsafe fn coo_set_strided_batch(
+    spMatDescr: cusparseSpMatDescr_t,
+    batchCount: ::std::os::raw::c_int,
+    batchStride: i64,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_coo_set_strided_batch(
+        spMatDescr.cast(),
+        batchCount,
+        batchStride,
+    ))
+}
+
+pub unsafe extern "system" fn spsm_create_descr(
+    descr: *mut cusparseSpSMDescr_t,
+) -> cusparseStatus_t {
+    cusparseStatus_t::CUSPARSE_STATUS_SUCCESS
+}
+
+unsafe fn spsm_buffersize(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    matC: cusparseDnMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpSMAlg_t,
+    spsmDescr: cusparseSpSMDescr_t,
+    bufferSize: *mut usize,
+) -> cusparseStatus_t {
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+    let data_type = data_type(computeType);
+
+    to_cuda(rocsparse_spsm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spsm_alg::rocsparse_spsm_alg_default,
+        rocsparse_spsm_stage::rocsparse_spsm_stage_buffer_size,
+        bufferSize,
+        ptr::null_mut(),
+    ))
+}
+
+unsafe fn spsm_analysis(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    matC: cusparseDnMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpSMAlg_t,
+    spsmDescr: cusparseSpSMDescr_t,
+    externalBuffer: *mut ::std::os::raw::c_void,
+) -> cusparseStatus_t {
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+    let data_type = data_type(computeType);
+
+    to_cuda(rocsparse_spsm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spsm_alg::rocsparse_spsm_alg_default,
+        rocsparse_spsm_stage::rocsparse_spsm_stage_preprocess,
+        ptr::null_mut(),
+        externalBuffer,
+    ))
+}
+
+pub unsafe extern "system" fn spsm_solve(
+    handle: cusparseHandle_t,
+    opA: cusparseOperation_t,
+    opB: cusparseOperation_t,
+    alpha: *const ::std::os::raw::c_void,
+    matA: cusparseSpMatDescr_t,
+    matB: cusparseDnMatDescr_t,
+    matC: cusparseDnMatDescr_t,
+    computeType: cudaDataType,
+    alg: cusparseSpSMAlg_t,
+    spsmDescr: cusparseSpSMDescr_t,
+) -> cusparseStatus_t {
+    let op_a = operation(opA);
+    let op_b = operation(opB);
+    let data_type = data_type(computeType);
+
+    let mut bufferSize: usize = 0;
+    let mut status = rocsparse_spsm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spsm_alg::rocsparse_spsm_alg_default,
+        rocsparse_spsm_stage::rocsparse_spsm_stage_buffer_size,
+        &mut bufferSize,
+        ptr::null_mut(),
+    );
+
+    if status != rocsparse_status::rocsparse_status_success {
+        return to_cuda(status);
+    }
+
+    let mut externalBuffer: *mut ::std::os::raw::c_void = ptr::null_mut();
+    hip_runtime_sys::hipMalloc(&mut externalBuffer, bufferSize);
+
+    status = rocsparse_spsm(
+        handle.cast(),
+        op_a,
+        op_b,
+        alpha,
+        matA.cast(),
+        matB.cast(),
+        matC.cast(),
+        data_type,
+        rocsparse_spsm_alg::rocsparse_spsm_alg_default,
+        rocsparse_spsm_stage::rocsparse_spsm_stage_compute,
+        ptr::null_mut(),
+        externalBuffer,
+    );
+    hip_runtime_sys::hipFree(externalBuffer);
+    to_cuda(status)
+}
+
+unsafe fn spsm_destroy_descr(descr: cusparseSpSMDescr_t) -> cusparseStatus_t {
+    cusparseStatus_t::CUSPARSE_STATUS_SUCCESS
+}
+
+pub unsafe extern "system" fn get_version(
+    handle: cusparseHandle_t,
+    version: *mut ::std::os::raw::c_int,
+) -> cusparseStatus_t {
+    to_cuda(rocsparse_get_version(handle.cast(), version))
 }

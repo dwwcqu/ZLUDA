@@ -1113,3 +1113,3779 @@ unsafe fn sgeam(
         ldc,
     ))
 }
+
+unsafe fn dcopy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_dcopy(handle.cast(), n, x, incx, y, incy))
+}
+
+unsafe fn zdotc_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    result: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zdotc(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        result.cast(),
+    ))
+}
+
+unsafe fn dgbmv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    kl: ::std::os::raw::c_int,
+    ku: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    beta: *const f64,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dgbmv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        kl,
+        ku,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
+}
+
+unsafe fn zhbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zhbmv(
+        handle.cast(),
+        fillMode,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zhemv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zhemv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zher_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zher(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x.cast(),
+        incx,
+        A.cast(),
+        lda,
+    ))
+}
+
+unsafe fn zher2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zher2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
+}
+
+unsafe fn zhpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    AP: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zhpmv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        AP.cast(),
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zhpr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    AP: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zhpr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x.cast(),
+        incx,
+        AP.cast(),
+    ))
+}
+
+unsafe fn zhpr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    AP: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zhpr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        AP.cast(),
+    ))
+}
+
+pub unsafe extern "system" fn dsbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    beta: *const f64,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dsbmv(
+        handle.cast(),
+        fillMode,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
+}
+
+unsafe fn dspmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    AP: *const f64,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    beta: *const f64,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dspmv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        AP,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
+}
+
+unsafe fn dspr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    AP: *mut f64,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dspr(handle.cast(), fillMode, n, alpha, x, incx, AP))
+}
+
+unsafe fn dspr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    y: *const f64,
+    incy: ::std::os::raw::c_int,
+    AP: *mut f64,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dspr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        y,
+        incy,
+        AP,
+    ))
+}
+
+unsafe fn dsymv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    beta: *const f64,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dsymv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
+}
+
+unsafe fn set_vector(
+    n: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    incx: ::std::os::raw::c_int,
+    devicePtr: *mut ::std::os::raw::c_void,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_set_vector(n, elemSize, x, incx, devicePtr, incy))
+}
+
+unsafe fn get_vector(
+    n: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_get_vector(n, elemSize, x, incx, y, incy))
+}
+
+unsafe fn set_matrix(
+    rows: ::std::os::raw::c_int,
+    cols: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    A: *const ::std::os::raw::c_void,
+    lda: ::std::os::raw::c_int,
+    B: *mut ::std::os::raw::c_void,
+    ldb: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_set_matrix(rows, cols, elemSize, A, lda, B, ldb))
+}
+
+unsafe fn get_matrix(
+    rows: ::std::os::raw::c_int,
+    cols: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    A: *const ::std::os::raw::c_void,
+    lda: ::std::os::raw::c_int,
+    B: *mut ::std::os::raw::c_void,
+    ldb: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_get_matrix(rows, cols, elemSize, A, lda, B, ldb))
+}
+
+unsafe fn set_vector_async(
+    n: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    hostPtr: *const ::std::os::raw::c_void,
+    incx: ::std::os::raw::c_int,
+    devicePtr: *mut ::std::os::raw::c_void,
+    incy: ::std::os::raw::c_int,
+    stream: cudaStream_t,
+) -> cublasStatus_t {
+    to_cuda(rocblas_set_vector_async(
+        n,
+        elemSize,
+        hostPtr,
+        incx,
+        devicePtr,
+        incy,
+        stream.cast(),
+    ))
+}
+
+unsafe fn get_vector_async(
+    n: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    devicePtr: *const ::std::os::raw::c_void,
+    incx: ::std::os::raw::c_int,
+    hostPtr: *mut ::std::os::raw::c_void,
+    incy: ::std::os::raw::c_int,
+    stream: cudaStream_t,
+) -> cublasStatus_t {
+    to_cuda(rocblas_get_vector_async(
+        n,
+        elemSize,
+        devicePtr,
+        incx,
+        hostPtr,
+        incy,
+        stream.cast(),
+    ))
+}
+
+unsafe fn set_matrix_async(
+    rows: ::std::os::raw::c_int,
+    cols: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    A: *const ::std::os::raw::c_void,
+    lda: ::std::os::raw::c_int,
+    B: *mut ::std::os::raw::c_void,
+    ldb: ::std::os::raw::c_int,
+    stream: cudaStream_t,
+) -> cublasStatus_t {
+    to_cuda(rocblas_set_matrix_async(
+        rows,
+        cols,
+        elemSize,
+        A,
+        lda,
+        B,
+        ldb,
+        stream.cast(),
+    ))
+}
+
+unsafe fn get_matrix_async(
+    rows: ::std::os::raw::c_int,
+    cols: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    A: *const ::std::os::raw::c_void,
+    lda: ::std::os::raw::c_int,
+    B: *mut ::std::os::raw::c_void,
+    ldb: ::std::os::raw::c_int,
+    stream: cudaStream_t,
+) -> cublasStatus_t {
+    to_cuda(rocblas_get_matrix_async(
+        rows,
+        cols,
+        elemSize,
+        A,
+        lda,
+        B,
+        ldb,
+        stream.cast(),
+    ))
+}
+
+unsafe fn nrm2_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_void,
+    resultType: cudaDataType,
+    executionType: cudaDataType,
+) -> cublasStatus_t {
+    let x_type = type_from_cuda(xType);
+    let result_type = type_from_cuda(resultType);
+    let execution_type = type_from_cuda(executionType);
+    to_cuda(rocblas_nrm2_ex(
+        handle.cast(),
+        n,
+        x,
+        x_type,
+        incx,
+        result,
+        result_type,
+        execution_type,
+    ))
+}
+
+unsafe fn snrm2_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    result: *mut f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_snrm2(handle.cast(), n, x, incx, result))
+}
+
+unsafe fn scnrm2_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_scnrm2(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn dznrm2_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut f64,
+) -> cublasStatus_t {
+    to_cuda(rocblas_dznrm2(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn dot_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *const ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_void,
+    resultType: cudaDataType,
+    executionType: cudaDataType,
+) -> cublasStatus_t {
+    let x_type = type_from_cuda(xType);
+    let y_type = type_from_cuda(yType);
+    let result_type = type_from_cuda(resultType);
+    let execution_type = type_from_cuda(executionType);
+    to_cuda(rocblas_dot_ex(
+        handle.cast(),
+        n,
+        x,
+        x_type,
+        incx,
+        y,
+        y_type,
+        incy,
+        result,
+        result_type,
+        execution_type,
+    ))
+}
+
+unsafe fn dotc_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *const ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_void,
+    resultType: cudaDataType,
+    executionType: cudaDataType,
+) -> cublasStatus_t {
+    let x_type = type_from_cuda(xType);
+    let y_type = type_from_cuda(yType);
+    let result_type = type_from_cuda(resultType);
+    let execution_type = type_from_cuda(executionType);
+    to_cuda(rocblas_dotc_ex(
+        handle.cast(),
+        n,
+        x,
+        x_type,
+        incx,
+        y,
+        y_type,
+        incy,
+        result,
+        result_type,
+        execution_type,
+    ))
+}
+
+unsafe fn sdot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *const f32,
+    incy: ::std::os::raw::c_int,
+    result: *mut f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_sdot(handle.cast(), n, x, incx, y, incy, result))
+}
+
+unsafe fn cdotu_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    result: *mut cuComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_cdotu(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        result.cast(),
+    ))
+}
+
+unsafe fn cdotc_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    result: *mut cuComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_cdotc(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        result.cast(),
+    ))
+}
+
+unsafe fn zdotu_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    result: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zdotu(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        result.cast(),
+    ))
+}
+
+unsafe fn scal_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const ::std::os::raw::c_void,
+    alphaType: cudaDataType,
+    x: *mut ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    executionType: cudaDataType,
+) -> cublasStatus_t {
+    let alpha_type = type_from_cuda(alphaType);
+    let x_type = type_from_cuda(xType);
+    let execution_type = type_from_cuda(executionType);
+    to_cuda(rocblas_scal_ex(
+        handle.cast(),
+        n,
+        alpha,
+        alpha_type,
+        x,
+        x_type,
+        incx,
+        execution_type,
+    ))
+}
+
+unsafe fn sscal_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_sscal(handle.cast(), n, alpha, x, incx))
+}
+
+unsafe fn cscal_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_cscal(
+        handle.cast(),
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+    ))
+}
+
+unsafe fn csscal_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_csscal(handle.cast(), n, alpha, x.cast(), incx))
+}
+
+unsafe fn zscal_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zscal(
+        handle.cast(),
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+    ))
+}
+
+unsafe fn zdscal_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zdscal(handle.cast(), n, alpha, x.cast(), incx))
+}
+
+unsafe fn axpy_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const ::std::os::raw::c_void,
+    alphaType: cudaDataType,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    let alpha_type = type_from_cuda(alphaType);
+    let x_type = type_from_cuda(xType);
+    let y_type = type_from_cuda(yType);
+    let execution_type = type_from_cuda(executiontype);
+    to_cuda(rocblas_axpy_ex(
+        handle.cast(),
+        n,
+        alpha,
+        alpha_type,
+        x,
+        x_type,
+        incx,
+        y,
+        y_type,
+        incy,
+        execution_type,
+    ))
+}
+
+unsafe fn saxpy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_saxpy(handle.cast(), n, alpha, x, incx, y, incy))
+}
+
+unsafe fn caxpy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_caxpy(
+        handle.cast(),
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zaxpy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zaxpy(
+        handle.cast(),
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn copy_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+}
+
+unsafe fn scopy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_scopy(handle.cast(), n, x, incx, y, incy))
+}
+
+unsafe fn ccopy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_ccopy(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zcopy_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zcopy(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn sswap_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_sswap(handle.cast(), n, x, incx, y, incy))
+}
+
+unsafe fn cswap_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_cswap(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn zswap_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zswap(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+    ))
+}
+
+unsafe fn swap_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+}
+
+unsafe fn isamax_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_isamax(handle.cast(), n, x, incx, result))
+}
+
+unsafe fn icamax_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_icamax(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn izamax_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_izamax(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn iamax_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+}
+
+unsafe fn isamin_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_isamin(handle.cast(), n, x, incx, result))
+}
+
+unsafe fn icamin_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_icamin(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn izamin_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    to_cuda(rocblas_izamin(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn iamin_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+}
+
+unsafe fn asum_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    result: *mut ::std::os::raw::c_void,
+    resultType: cudaDataType,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+}
+
+unsafe fn sasum_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    result: *mut f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_sasum(handle.cast(), n, x, incx, result))
+}
+
+unsafe fn scasum_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_scasum(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn dzasum_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    result: *mut f64,
+) -> cublasStatus_t {
+    to_cuda(rocblas_dzasum(handle.cast(), n, x.cast(), incx, result))
+}
+
+unsafe fn srot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+    c: *const f32,
+    s: *const f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_srot(handle.cast(), n, x, incx, y, incy, c, s))
+}
+
+unsafe fn crot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+    c: *const f32,
+    s: *const cuComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_crot(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        c,
+        s.cast(),
+    ))
+}
+
+unsafe fn csrot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+    c: *const f32,
+    s: *const f32,
+) -> cublasStatus_t {
+    to_cuda(rocblas_csrot(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        c,
+        s,
+    ))
+}
+
+unsafe fn zrot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    c: *const f64,
+    s: *const cuDoubleComplex,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zrot(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        c,
+        s.cast(),
+    ))
+}
+
+unsafe fn zdrot_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    c: *const f64,
+    s: *const f64,
+) -> cublasStatus_t {
+    to_cuda(rocblas_zdrot(
+        handle.cast(),
+        n,
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        c,
+        s,
+    ))
+}
+
+unsafe fn rot_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+    c: *const ::std::os::raw::c_void,
+    s: *const ::std::os::raw::c_void,
+    csType: cudaDataType,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    let x_type = type_from_cuda(xType);
+    let y_type = type_from_cuda(yType);
+    let cs_type = type_from_cuda(csType);
+    let execution_type = type_from_cuda(executiontype);
+    to_cuda(rocblas_rot_ex(
+        handle.cast(),
+        n,
+        x,
+        x_type,
+        incx,
+        y,
+        y_type,
+        incy,
+        c,
+        s,
+        cs_type,
+        execution_type,
+    ))
+}
+
+unsafe fn srotg_v2(
+    handle: cublasHandle_t,
+    a: *mut f32,
+    b: *mut f32,
+    c: *mut f32,
+    s: *mut f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn crotg_v2(
+    handle: cublasHandle_t,
+    a: *mut cuComplex,
+    b: *mut cuComplex,
+    c: *mut f32,
+    s: *mut cuComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zrotg_v2(
+    handle: cublasHandle_t,
+    a: *mut cuDoubleComplex,
+    b: *mut cuDoubleComplex,
+    c: *mut f64,
+    s: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn rotg_ex(
+    handle: cublasHandle_t,
+    a: *mut ::std::os::raw::c_void,
+    b: *mut ::std::os::raw::c_void,
+    abType: cudaDataType,
+    c: *mut ::std::os::raw::c_void,
+    s: *mut ::std::os::raw::c_void,
+    csType: cudaDataType,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn srotm_v2(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+    param: *const f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn rotm_ex(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    x: *mut ::std::os::raw::c_void,
+    xType: cudaDataType,
+    incx: ::std::os::raw::c_int,
+    y: *mut ::std::os::raw::c_void,
+    yType: cudaDataType,
+    incy: ::std::os::raw::c_int,
+    param: *const ::std::os::raw::c_void,
+    paramType: cudaDataType,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn srotmg_v2(
+    handle: cublasHandle_t,
+    d1: *mut f32,
+    d2: *mut f32,
+    x1: *mut f32,
+    y1: *const f32,
+    param: *mut f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn rotmg_ex(
+    handle: cublasHandle_t,
+    d1: *mut ::std::os::raw::c_void,
+    d1Type: cudaDataType,
+    d2: *mut ::std::os::raw::c_void,
+    d2Type: cudaDataType,
+    x1: *mut ::std::os::raw::c_void,
+    x1Type: cudaDataType,
+    y1: *const ::std::os::raw::c_void,
+    y1Type: cudaDataType,
+    param: *mut ::std::os::raw::c_void,
+    paramType: cudaDataType,
+    executiontype: cudaDataType,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgbmv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    kl: ::std::os::raw::c_int,
+    ku: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    beta: *const f32,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgbmv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    kl: ::std::os::raw::c_int,
+    ku: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgbmv_v2(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    kl: ::std::os::raw::c_int,
+    ku: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtrmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctrmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn stbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn stpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f32,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f64,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuComplex,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuDoubleComplex,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtrsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctrsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn stpsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f32,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtpsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f64,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctpsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuComplex,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztpsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuDoubleComplex,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn stbsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *mut f32,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtbsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *mut f64,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctbsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztbsv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *mut cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssymv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    beta: *const f32,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csymv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsymv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chemv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    beta: *const f32,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chbmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sspmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    AP: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    beta: *const f32,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chpmv_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    AP: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sger_v2(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *const f32,
+    incy: ::std::os::raw::c_int,
+    A: *mut f32,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgeru_v2(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgerc_v2(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgeru_v2(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgerc_v2(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssyr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    A: *mut f32,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsyr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    A: *mut f64,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsyr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cher_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sspr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    AP: *mut f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chpr_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    AP: *mut cuComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssyr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *const f32,
+    incy: ::std::os::raw::c_int,
+    A: *mut f32,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsyr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    y: *const f64,
+    incy: ::std::os::raw::c_int,
+    A: *mut f64,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsyr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cher2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sspr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    y: *const f32,
+    incy: ::std::os::raw::c_int,
+    AP: *mut f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chpr2_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    y: *const cuComplex,
+    incy: ::std::os::raw::c_int,
+    AP: *mut cuComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgemv_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    Aarray: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    xarray: *const *const f32,
+    incx: ::std::os::raw::c_int,
+    beta: *const f32,
+    yarray: *const *mut f32,
+    incy: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgemv_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    Aarray: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    xarray: *const *const f64,
+    incx: ::std::os::raw::c_int,
+    beta: *const f64,
+    yarray: *const *mut f64,
+    incy: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemv_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    Aarray: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    xarray: *const *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    yarray: *const *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemv_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    Aarray: *const *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    xarray: *const *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    yarray: *const *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgemv_strided_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    strideA: ::std::os::raw::c_longlong,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    stridex: ::std::os::raw::c_longlong,
+    beta: *const f32,
+    y: *mut f32,
+    incy: ::std::os::raw::c_int,
+    stridey: ::std::os::raw::c_longlong,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgemv_strided_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    strideA: ::std::os::raw::c_longlong,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    stridex: ::std::os::raw::c_longlong,
+    beta: *const f64,
+    y: *mut f64,
+    incy: ::std::os::raw::c_int,
+    stridey: ::std::os::raw::c_longlong,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemv_strided_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    strideA: ::std::os::raw::c_longlong,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    stridex: ::std::os::raw::c_longlong,
+    beta: *const cuComplex,
+    y: *mut cuComplex,
+    incy: ::std::os::raw::c_int,
+    stridey: ::std::os::raw::c_longlong,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemv_strided_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    strideA: ::std::os::raw::c_longlong,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    stridex: ::std::os::raw::c_longlong,
+    beta: *const cuDoubleComplex,
+    y: *mut cuDoubleComplex,
+    incy: ::std::os::raw::c_int,
+    stridey: ::std::os::raw::c_longlong,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm_v2(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm3m(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm3m_ex(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    B: *const ::std::os::raw::c_void,
+    Btype: cudaDataType,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemm_v2(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemm3m(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+unsafe fn cgemm_ex(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    B: *const ::std::os::raw::c_void,
+    Btype: cudaDataType,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn uint8gemm_bias(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    transc: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    A: *const ::std::os::raw::c_uchar,
+    A_bias: ::std::os::raw::c_int,
+    lda: ::std::os::raw::c_int,
+    B: *const ::std::os::raw::c_uchar,
+    B_bias: ::std::os::raw::c_int,
+    ldb: ::std::os::raw::c_int,
+    C: *mut ::std::os::raw::c_uchar,
+    C_bias: ::std::os::raw::c_int,
+    ldc: ::std::os::raw::c_int,
+    C_mult: ::std::os::raw::c_int,
+    C_shift: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssyrk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsyrk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyrk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsyrk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyrk_ex(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyrk3m_ex(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cherk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zherk_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cherk_ex(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cherk3m_ex(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const ::std::os::raw::c_void,
+    Atype: cudaDataType,
+    lda: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut ::std::os::raw::c_void,
+    Ctype: cudaDataType,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssyr2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *const f32,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsyr2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    B: *const f64,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyr2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsyr2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cher2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zher2k_v2(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssyrkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *const f32,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsyrkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    B: *const f64,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csyrkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsyrkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cherkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zherkx(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ssymm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *const f32,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dsymm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    B: *const f64,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn csymm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zsymm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn chemm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zhemm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strsm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *mut f32,
+    ldb: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctrsm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *mut cuComplex,
+    ldb: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrsm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *mut cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strmm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *const f32,
+    ldb: ::std::os::raw::c_int,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+unsafe fn ctrmm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrmm_v2(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgemm_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f32,
+    Aarray: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    Barray: *const *const f32,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f32,
+    Carray: *const *mut f32,
+    ldc: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgemm_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const f64,
+    Aarray: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    Barray: *const *const f64,
+    ldb: ::std::os::raw::c_int,
+    beta: *const f64,
+    Carray: *const *mut f64,
+    ldc: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    Aarray: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    Barray: *const *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    Carray: *const *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm3m_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    Aarray: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    Barray: *const *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    Carray: *const *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgemm_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    Aarray: *const *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    Barray: *const *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    Carray: *const *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgemm3m_strided_batched(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    k: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    strideA: ::std::os::raw::c_longlong,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    strideB: ::std::os::raw::c_longlong,
+    beta: *const cuComplex,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+    strideC: ::std::os::raw::c_longlong,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgeam(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    beta: *const f64,
+    B: *const f64,
+    ldb: ::std::os::raw::c_int,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgeam(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuComplex,
+    B: *const cuComplex,
+    ldb: ::std::os::raw::c_int,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgeam(
+    handle: cublasHandle_t,
+    transa: cublasOperation_t,
+    transb: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    beta: *const cuDoubleComplex,
+    B: *const cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgetrf_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *mut f32,
+    lda: ::std::os::raw::c_int,
+    P: *mut ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgetrf_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *mut f64,
+    lda: ::std::os::raw::c_int,
+    P: *mut ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgetri_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    P: *const ::std::os::raw::c_int,
+    C: *const *mut f32,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgetri_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    P: *const ::std::os::raw::c_int,
+    C: *const *mut f64,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+unsafe fn sgetrs_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    devIpiv: *const ::std::os::raw::c_int,
+    Barray: *const *mut f32,
+    ldb: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgetrs_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    devIpiv: *const ::std::os::raw::c_int,
+    Barray: *const *mut f64,
+    ldb: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgetrs_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    devIpiv: *const ::std::os::raw::c_int,
+    Barray: *const *mut cuComplex,
+    ldb: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgetrs_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    devIpiv: *const ::std::os::raw::c_int,
+    Barray: *const *mut cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strsm_batched(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f32,
+    A: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    B: *const *mut f32,
+    ldb: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtrsm_batched(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const f64,
+    A: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    B: *const *mut f64,
+    ldb: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctrsm_batched(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuComplex,
+    A: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const *mut cuComplex,
+    ldb: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrsm_batched(
+    handle: cublasHandle_t,
+    side: cublasSideMode_t,
+    uplo: cublasFillMode_t,
+    trans: cublasOperation_t,
+    diag: cublasDiagType_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    alpha: *const cuDoubleComplex,
+    A: *const *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    B: *const *mut cuDoubleComplex,
+    ldb: ::std::os::raw::c_int,
+    batchCount: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn smatinv_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const f32,
+    lda: ::std::os::raw::c_int,
+    Ainv: *const *mut f32,
+    lda_inv: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dmatinv_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const f64,
+    lda: ::std::os::raw::c_int,
+    Ainv: *const *mut f64,
+    lda_inv: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cmatinv_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    Ainv: *const *mut cuComplex,
+    lda_inv: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zmatinv_batched(
+    handle: cublasHandle_t,
+    n: ::std::os::raw::c_int,
+    A: *const *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    Ainv: *const *mut cuDoubleComplex,
+    lda_inv: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgeqrf_batched(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    Aarray: *const *mut f32,
+    lda: ::std::os::raw::c_int,
+    TauArray: *const *mut f32,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgeqrf_batched(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    Aarray: *const *mut f64,
+    lda: ::std::os::raw::c_int,
+    TauArray: *const *mut f64,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgeqrf_batched(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    Aarray: *const *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+    TauArray: *const *mut cuComplex,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgeqrf_batched(
+    handle: cublasHandle_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    Aarray: *const *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    TauArray: *const *mut cuDoubleComplex,
+    info: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sgels_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *mut f32,
+    lda: ::std::os::raw::c_int,
+    Carray: *const *mut f32,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    devInfoArray: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dgels_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *mut f64,
+    lda: ::std::os::raw::c_int,
+    Carray: *const *mut f64,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    devInfoArray: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cgels_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+    Carray: *const *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    devInfoArray: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zgels_batched(
+    handle: cublasHandle_t,
+    trans: cublasOperation_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    nrhs: ::std::os::raw::c_int,
+    Aarray: *const *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    Carray: *const *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+    info: *mut ::std::os::raw::c_int,
+    devInfoArray: *mut ::std::os::raw::c_int,
+    batchSize: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn sdgmm(
+    handle: cublasHandle_t,
+    mode: cublasSideMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    x: *const f32,
+    incx: ::std::os::raw::c_int,
+    C: *mut f32,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ddgmm(
+    handle: cublasHandle_t,
+    mode: cublasSideMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    x: *const f64,
+    incx: ::std::os::raw::c_int,
+    C: *mut f64,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn cdgmm(
+    handle: cublasHandle_t,
+    mode: cublasSideMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuComplex,
+    incx: ::std::os::raw::c_int,
+    C: *mut cuComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn zdgmm(
+    handle: cublasHandle_t,
+    mode: cublasSideMode_t,
+    m: ::std::os::raw::c_int,
+    n: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    x: *const cuDoubleComplex,
+    incx: ::std::os::raw::c_int,
+    C: *mut cuDoubleComplex,
+    ldc: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn stpttr(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f32,
+    A: *mut f32,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtpttr(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    AP: *const f64,
+    A: *mut f64,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctpttr(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuComplex,
+    A: *mut cuComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztpttr(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    AP: *const cuDoubleComplex,
+    A: *mut cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn strttp(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    A: *const f32,
+    lda: ::std::os::raw::c_int,
+    AP: *mut f32,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn dtrttp(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    A: *const f64,
+    lda: ::std::os::raw::c_int,
+    AP: *mut f64,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ctrttp(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuComplex,
+    lda: ::std::os::raw::c_int,
+    AP: *mut cuComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn ztrttp(
+    handle: cublasHandle_t,
+    uplo: cublasFillMode_t,
+    n: ::std::os::raw::c_int,
+    A: *const cuDoubleComplex,
+    lda: ::std::os::raw::c_int,
+    AP: *mut cuDoubleComplex,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn shutdown() -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn get_error() -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn get_version(version: *mut ::std::os::raw::c_int) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn alloc(
+    n: ::std::os::raw::c_int,
+    elemSize: ::std::os::raw::c_int,
+    devicePtr: *mut *mut ::std::os::raw::c_void,
+) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn free(devicePtr: *mut ::std::os::raw::c_void) -> cublasStatus_t {
+    crate::unsupported()
+}
+
+unsafe fn set_kernel_stream(stream: cudaStream_t) -> cublasStatus_t {
+    crate::unsupported()
+}
