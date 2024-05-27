@@ -7,7 +7,8 @@ use cuda_types::*;
 use rocblas_sys::*;
 use rocsolver_sys::{
     rocsolver_cgetrf_batched, rocsolver_cgetri_batched, rocsolver_cgetri_outofplace_batched,
-    rocsolver_zgetrf_batched, rocsolver_zgetri_batched, rocsolver_zgetri_outofplace_batched,
+    rocsolver_sgetrf_batched, rocsolver_sgetrf_npvt_batched, rocsolver_zgetrf_batched,
+    rocsolver_zgetri_batched, rocsolver_zgetri_outofplace_batched,
 };
 use std::{mem, ptr};
 
@@ -25,6 +26,69 @@ fn to_cuda(status: rocblas_sys::rocblas_status) -> cublasStatus_t {
     match status {
         rocblas_sys::rocblas_status::rocblas_status_success => {
             cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocblas_sys::rocblas_status::rocblas_status_size_unchanged => {
+            cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocblas_sys::rocblas_status::rocblas_status_size_increased => {
+            cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocblas_sys::rocblas_status::rocblas_status_invalid_handle => {
+            cublasStatus_t::CUBLAS_STATUS_NOT_INITIALIZED
+        }
+        rocblas_sys::rocblas_status::rocblas_status_not_implemented => {
+            cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+        }
+        rocblas_sys::rocblas_status::rocblas_status_invalid_pointer => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocblas_sys::rocblas_status::rocblas_status_invalid_size => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocblas_sys::rocblas_status::rocblas_status_invalid_value => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocblas_sys::rocblas_status::rocblas_status_invalid_value => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocblas_sys::rocblas_status::rocblas_status_memory_error => {
+            cublasStatus_t::CUBLAS_STATUS_INTERNAL_ERROR
+        }
+        _ => cublasStatus_t::CUBLAS_STATUS_INTERNAL_ERROR,
+    }
+}
+
+fn rocsolver_to_cuda(status: rocsolver_sys::rocsolver_status) -> cublasStatus_t {
+    match status {
+        rocsolver_sys::rocblas_status::rocblas_status_success => {
+            cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_size_unchanged => {
+            cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_size_increased => {
+            cublasStatus_t::CUBLAS_STATUS_SUCCESS
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_invalid_handle => {
+            cublasStatus_t::CUBLAS_STATUS_NOT_INITIALIZED
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_not_implemented => {
+            cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_invalid_pointer => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_invalid_size => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_invalid_value => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_invalid_value => {
+            cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE
+        }
+        rocsolver_sys::rocblas_status::rocblas_status_memory_error => {
+            cublasStatus_t::CUBLAS_STATUS_INTERNAL_ERROR
         }
         _ => cublasStatus_t::CUBLAS_STATUS_INTERNAL_ERROR,
     }
@@ -79,6 +143,19 @@ fn op_from_cuda(trans: cublasOperation_t) -> rocblas_operation {
         cublasOperation_t::CUBLAS_OP_N => rocblas_operation::rocblas_operation_none,
         cublasOperation_t::CUBLAS_OP_T => rocblas_operation::rocblas_operation_transpose,
         cublasOperation_t::CUBLAS_OP_C => rocblas_operation::rocblas_operation_conjugate_transpose,
+        _ => panic!(),
+    }
+}
+
+fn rocsolver_op_from_cuda(trans: cublasOperation_t) -> rocsolver_sys::rocblas_operation {
+    match trans {
+        cublasOperation_t::CUBLAS_OP_N => rocsolver_sys::rocblas_operation::rocblas_operation_none,
+        cublasOperation_t::CUBLAS_OP_T => {
+            rocsolver_sys::rocblas_operation::rocblas_operation_transpose
+        }
+        cublasOperation_t::CUBLAS_OP_C => {
+            rocsolver_sys::rocblas_operation::rocblas_operation_conjugate_transpose
+        }
         _ => panic!(),
     }
 }
@@ -2367,7 +2444,7 @@ unsafe fn srotg_v2(
     c: *mut f32,
     s: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_srotg(handle.cast(), a, b, c, s))
 }
 
 unsafe fn crotg_v2(
@@ -2377,7 +2454,13 @@ unsafe fn crotg_v2(
     c: *mut f32,
     s: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_crotg(
+        handle.cast(),
+        a.cast(),
+        b.cast(),
+        c,
+        s.cast(),
+    ))
 }
 
 unsafe fn zrotg_v2(
@@ -2387,7 +2470,13 @@ unsafe fn zrotg_v2(
     c: *mut f64,
     s: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_zrotg(
+        handle.cast(),
+        a.cast(),
+        b.cast(),
+        c,
+        s.cast(),
+    ))
 }
 
 unsafe fn rotg_ex(
@@ -2400,7 +2489,7 @@ unsafe fn rotg_ex(
     csType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn srotm_v2(
@@ -2412,7 +2501,7 @@ unsafe fn srotm_v2(
     incy: ::std::os::raw::c_int,
     param: *const f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_srotm(handle.cast(), n, x, incx, y, incy, param))
 }
 
 unsafe fn rotm_ex(
@@ -2428,7 +2517,7 @@ unsafe fn rotm_ex(
     paramType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn srotmg_v2(
@@ -2439,7 +2528,7 @@ unsafe fn srotmg_v2(
     y1: *const f32,
     param: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_srotmg(handle.cast(), d1, d2, x1, y1, param))
 }
 
 unsafe fn rotmg_ex(
@@ -2456,7 +2545,7 @@ unsafe fn rotmg_ex(
     paramType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn cgemv_v2(
@@ -2473,7 +2562,21 @@ unsafe fn cgemv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cgemv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn zgemv_v2(
@@ -2490,7 +2593,21 @@ unsafe fn zgemv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zgemv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn sgbmv_v2(
@@ -2509,7 +2626,23 @@ unsafe fn sgbmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_sgbmv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        kl,
+        ku,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
 }
 
 unsafe fn cgbmv_v2(
@@ -2528,7 +2661,23 @@ unsafe fn cgbmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cgbmv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        kl,
+        ku,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn zgbmv_v2(
@@ -2547,7 +2696,23 @@ unsafe fn zgbmv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zgbmv(
+        handle.cast(),
+        op,
+        m,
+        n,
+        kl,
+        ku,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn strmv_v2(
@@ -2561,7 +2726,20 @@ unsafe fn strmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_strmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtrmv_v2(
@@ -2575,7 +2753,20 @@ unsafe fn dtrmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtrmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctrmv_v2(
@@ -2589,7 +2780,20 @@ unsafe fn ctrmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctrmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztrmv_v2(
@@ -2603,7 +2807,20 @@ unsafe fn ztrmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztrmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn stbmv_v2(
@@ -2618,7 +2835,21 @@ unsafe fn stbmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_stbmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtbmv_v2(
@@ -2633,7 +2864,21 @@ unsafe fn dtbmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtbmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctbmv_v2(
@@ -2648,7 +2893,21 @@ unsafe fn ctbmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctbmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztbmv_v2(
@@ -2663,7 +2922,21 @@ unsafe fn ztbmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztbmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn stpmv_v2(
@@ -2676,7 +2949,19 @@ unsafe fn stpmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_stpmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtpmv_v2(
@@ -2689,7 +2974,19 @@ unsafe fn dtpmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtpmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctpmv_v2(
@@ -2702,7 +2999,19 @@ unsafe fn ctpmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctpmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP.cast(),
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztpmv_v2(
@@ -2715,7 +3024,19 @@ unsafe fn ztpmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztpmv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP.cast(),
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn strsv_v2(
@@ -2729,7 +3050,20 @@ unsafe fn strsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_strsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtrsv_v2(
@@ -2743,7 +3077,20 @@ unsafe fn dtrsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtrsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctrsv_v2(
@@ -2757,7 +3104,20 @@ unsafe fn ctrsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctrsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztrsv_v2(
@@ -2771,7 +3131,20 @@ unsafe fn ztrsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztrsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn stpsv_v2(
@@ -2784,7 +3157,19 @@ unsafe fn stpsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_stpsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtpsv_v2(
@@ -2797,7 +3182,19 @@ unsafe fn dtpsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtpsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctpsv_v2(
@@ -2810,7 +3207,19 @@ unsafe fn ctpsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctpsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP.cast(),
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztpsv_v2(
@@ -2823,7 +3232,19 @@ unsafe fn ztpsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztpsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        AP.cast(),
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn stbsv_v2(
@@ -2838,7 +3259,21 @@ unsafe fn stbsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_stbsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn dtbsv_v2(
@@ -2853,7 +3288,21 @@ unsafe fn dtbsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_dtbsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A,
+        lda,
+        x,
+        incx,
+    ))
 }
 
 unsafe fn ctbsv_v2(
@@ -2868,7 +3317,21 @@ unsafe fn ctbsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ctbsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ztbsv_v2(
@@ -2883,7 +3346,21 @@ unsafe fn ztbsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diagType = to_diag(diag);
+    to_cuda(rocblas_ztbsv(
+        handle.cast(),
+        fillMode,
+        op,
+        diagType,
+        n,
+        k,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+    ))
 }
 
 unsafe fn ssymv_v2(
@@ -2899,7 +3376,20 @@ unsafe fn ssymv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_ssymv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
 }
 
 unsafe fn csymv_v2(
@@ -2915,7 +3405,20 @@ unsafe fn csymv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_csymv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn zsymv_v2(
@@ -2931,7 +3434,20 @@ unsafe fn zsymv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zsymv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn chemv_v2(
@@ -2947,7 +3463,20 @@ unsafe fn chemv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_chemv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn ssbmv_v2(
@@ -2964,7 +3493,21 @@ unsafe fn ssbmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_ssbmv(
+        handle.cast(),
+        fillMode,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
 }
 
 unsafe fn chbmv_v2(
@@ -2981,7 +3524,21 @@ unsafe fn chbmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_chbmv(
+        handle.cast(),
+        fillMode,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn sspmv_v2(
@@ -2996,7 +3553,19 @@ unsafe fn sspmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_sspmv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        AP,
+        x,
+        incx,
+        beta,
+        y,
+        incy,
+    ))
 }
 
 unsafe fn chpmv_v2(
@@ -3011,7 +3580,19 @@ unsafe fn chpmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_chpmv(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        AP.cast(),
+        x.cast(),
+        incx,
+        beta.cast(),
+        y.cast(),
+        incy,
+    ))
 }
 
 unsafe fn sger_v2(
@@ -3026,7 +3607,18 @@ unsafe fn sger_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_sger(
+        handle.cast(),
+        m,
+        n,
+        alpha,
+        x,
+        incx,
+        y,
+        incy,
+        A,
+        lda,
+    ))
 }
 
 unsafe fn cgeru_v2(
@@ -3041,7 +3633,18 @@ unsafe fn cgeru_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_cgeru(
+        handle.cast(),
+        m,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn cgerc_v2(
@@ -3056,7 +3659,18 @@ unsafe fn cgerc_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_cgerc(
+        handle.cast(),
+        m,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn zgeru_v2(
@@ -3071,7 +3685,18 @@ unsafe fn zgeru_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_zgeru(
+        handle.cast(),
+        m,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn zgerc_v2(
@@ -3086,7 +3711,18 @@ unsafe fn zgerc_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    to_cuda(rocblas_zgerc(
+        handle.cast(),
+        m,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn ssyr_v2(
@@ -3099,7 +3735,17 @@ unsafe fn ssyr_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_ssyr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        A,
+        lda,
+    ))
 }
 
 unsafe fn dsyr_v2(
@@ -3112,7 +3758,17 @@ unsafe fn dsyr_v2(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dsyr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        A,
+        lda,
+    ))
 }
 
 unsafe fn csyr_v2(
@@ -3125,7 +3781,17 @@ unsafe fn csyr_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_csyr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn zsyr_v2(
@@ -3138,7 +3804,17 @@ unsafe fn zsyr_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zsyr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn cher_v2(
@@ -3151,7 +3827,17 @@ unsafe fn cher_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_cher(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x.cast(),
+        incx,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn sspr_v2(
@@ -3163,7 +3849,8 @@ unsafe fn sspr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_sspr(handle.cast(), fillMode, n, alpha, x, incx, AP))
 }
 
 unsafe fn chpr_v2(
@@ -3175,7 +3862,16 @@ unsafe fn chpr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_chpr(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x.cast(),
+        incx,
+        AP.cast(),
+    ))
 }
 
 unsafe fn ssyr2_v2(
@@ -3190,7 +3886,19 @@ unsafe fn ssyr2_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_ssyr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        y,
+        incy,
+        A,
+        lda,
+    ))
 }
 
 unsafe fn dsyr2_v2(
@@ -3205,7 +3913,19 @@ unsafe fn dsyr2_v2(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_dsyr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        y,
+        incy,
+        A,
+        lda,
+    ))
 }
 
 unsafe fn csyr2_v2(
@@ -3220,7 +3940,19 @@ unsafe fn csyr2_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_csyr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn zsyr2_v2(
@@ -3235,7 +3967,19 @@ unsafe fn zsyr2_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_zsyr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn cher2_v2(
@@ -3250,7 +3994,19 @@ unsafe fn cher2_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_cher2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        A.cast(),
+        lda,
+    ))
 }
 
 unsafe fn sspr2_v2(
@@ -3264,7 +4020,18 @@ unsafe fn sspr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_sspr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha,
+        x,
+        incx,
+        y,
+        incy,
+        AP,
+    ))
 }
 
 unsafe fn chpr2_v2(
@@ -3278,7 +4045,18 @@ unsafe fn chpr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    to_cuda(rocblas_chpr2(
+        handle.cast(),
+        fillMode,
+        n,
+        alpha.cast(),
+        x.cast(),
+        incx,
+        y.cast(),
+        incy,
+        AP.cast(),
+    ))
 }
 
 unsafe fn sgemv_batched(
@@ -3296,7 +4074,22 @@ unsafe fn sgemv_batched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_sgemv_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha,
+        Aarray,
+        lda,
+        xarray,
+        incx,
+        beta,
+        yarray,
+        incy,
+        batchCount,
+    ))
 }
 
 unsafe fn dgemv_batched(
@@ -3314,7 +4107,22 @@ unsafe fn dgemv_batched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dgemv_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha,
+        Aarray,
+        lda,
+        xarray,
+        incx,
+        beta,
+        yarray,
+        incy,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemv_batched(
@@ -3332,7 +4140,22 @@ unsafe fn cgemv_batched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cgemv_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        Aarray.cast(),
+        lda,
+        xarray.cast(),
+        incx,
+        beta.cast(),
+        yarray.cast(),
+        incy,
+        batchCount,
+    ))
 }
 
 unsafe fn zgemv_batched(
@@ -3350,7 +4173,22 @@ unsafe fn zgemv_batched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zgemv_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        Aarray.cast(),
+        lda,
+        xarray.cast(),
+        incx,
+        beta.cast(),
+        yarray.cast(),
+        incy,
+        batchCount,
+    ))
 }
 
 unsafe fn sgemv_strided_batched(
@@ -3371,7 +4209,25 @@ unsafe fn sgemv_strided_batched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_sgemv_strided_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        strideA,
+        x,
+        incx,
+        stridex,
+        beta,
+        y,
+        incy,
+        stridey,
+        batchCount,
+    ))
 }
 
 unsafe fn dgemv_strided_batched(
@@ -3392,7 +4248,25 @@ unsafe fn dgemv_strided_batched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dgemv_strided_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        strideA,
+        x,
+        incx,
+        stridex,
+        beta,
+        y,
+        incy,
+        stridey,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemv_strided_batched(
@@ -3413,7 +4287,25 @@ unsafe fn cgemv_strided_batched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cgemv_strided_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        strideA,
+        x.cast(),
+        incx,
+        stridex,
+        beta.cast(),
+        y.cast(),
+        incy,
+        stridey,
+        batchCount,
+    ))
 }
 
 unsafe fn zgemv_strided_batched(
@@ -3434,7 +4326,25 @@ unsafe fn zgemv_strided_batched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zgemv_strided_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        strideA,
+        x.cast(),
+        incx,
+        stridex,
+        beta.cast(),
+        y.cast(),
+        incy,
+        stridey,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemm_v2(
@@ -3453,7 +4363,24 @@ unsafe fn cgemm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_cgemm(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn cgemm3m(
@@ -3472,7 +4399,7 @@ unsafe fn cgemm3m(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn cgemm3m_ex(
@@ -3494,7 +4421,7 @@ unsafe fn cgemm3m_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn zgemm_v2(
@@ -3513,7 +4440,24 @@ unsafe fn zgemm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_zgemm(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zgemm3m(
@@ -3532,7 +4476,7 @@ unsafe fn zgemm3m(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 unsafe fn cgemm_ex(
     handle: cublasHandle_t,
@@ -3553,7 +4497,7 @@ unsafe fn cgemm_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn uint8gemm_bias(
@@ -3576,7 +4520,7 @@ unsafe fn uint8gemm_bias(
     C_mult: ::std::os::raw::c_int,
     C_shift: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ssyrk_v2(
@@ -3592,7 +4536,21 @@ unsafe fn ssyrk_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_ssyrk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn dsyrk_v2(
@@ -3608,7 +4566,21 @@ unsafe fn dsyrk_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dsyrk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn csyrk_v2(
@@ -3624,7 +4596,21 @@ unsafe fn csyrk_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_csyrk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zsyrk_v2(
@@ -3640,7 +4626,21 @@ unsafe fn zsyrk_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zsyrk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn csyrk_ex(
@@ -3658,7 +4658,7 @@ unsafe fn csyrk_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn csyrk3m_ex(
@@ -3676,7 +4676,7 @@ unsafe fn csyrk3m_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn cherk_v2(
@@ -3692,7 +4692,21 @@ unsafe fn cherk_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cherk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A.cast(),
+        lda,
+        beta,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zherk_v2(
@@ -3708,7 +4722,21 @@ unsafe fn zherk_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zherk(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A.cast(),
+        lda,
+        beta,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn cherk_ex(
@@ -3726,7 +4754,7 @@ unsafe fn cherk_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn cherk3m_ex(
@@ -3744,7 +4772,7 @@ unsafe fn cherk3m_ex(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ssyr2k_v2(
@@ -3762,7 +4790,23 @@ unsafe fn ssyr2k_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_ssyr2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn dsyr2k_v2(
@@ -3780,7 +4824,23 @@ unsafe fn dsyr2k_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dsyr2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn csyr2k_v2(
@@ -3798,7 +4858,23 @@ unsafe fn csyr2k_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_csyr2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zsyr2k_v2(
@@ -3816,7 +4892,23 @@ unsafe fn zsyr2k_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zsyr2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn cher2k_v2(
@@ -3834,7 +4926,23 @@ unsafe fn cher2k_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cher2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zher2k_v2(
@@ -3852,7 +4960,23 @@ unsafe fn zher2k_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zher2k(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn ssyrkx(
@@ -3870,7 +4994,23 @@ unsafe fn ssyrkx(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_ssyrkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn dsyrkx(
@@ -3888,7 +5028,23 @@ unsafe fn dsyrkx(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_dsyrkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn csyrkx(
@@ -3906,7 +5062,23 @@ unsafe fn csyrkx(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_csyrkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zsyrkx(
@@ -3924,7 +5096,23 @@ unsafe fn zsyrkx(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zsyrkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn cherkx(
@@ -3942,7 +5130,23 @@ unsafe fn cherkx(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_cherkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zherkx(
@@ -3960,7 +5164,23 @@ unsafe fn zherkx(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    to_cuda(rocblas_zherkx(
+        handle.cast(),
+        fillMode,
+        op,
+        n,
+        k,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn ssymm_v2(
@@ -3978,7 +5198,23 @@ unsafe fn ssymm_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_ssymm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn dsymm_v2(
@@ -3996,7 +5232,23 @@ unsafe fn dsymm_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_dsymm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        beta,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn csymm_v2(
@@ -4014,7 +5266,23 @@ unsafe fn csymm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_csymm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zsymm_v2(
@@ -4032,7 +5300,23 @@ unsafe fn zsymm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_zsymm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn chemm_v2(
@@ -4050,7 +5334,23 @@ unsafe fn chemm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_chemm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zhemm_v2(
@@ -4068,7 +5368,23 @@ unsafe fn zhemm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    to_cuda(rocblas_zhemm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        beta.cast(),
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn strsm_v2(
@@ -4085,7 +5401,24 @@ unsafe fn strsm_v2(
     B: *mut f32,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_strsm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+    ))
 }
 
 unsafe fn ctrsm_v2(
@@ -4102,7 +5435,24 @@ unsafe fn ctrsm_v2(
     B: *mut cuComplex,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ctrsm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+    ))
 }
 
 unsafe fn ztrsm_v2(
@@ -4119,7 +5469,24 @@ unsafe fn ztrsm_v2(
     B: *mut cuDoubleComplex,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ztrsm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+    ))
 }
 
 unsafe fn strmm_v2(
@@ -4138,8 +5505,26 @@ unsafe fn strmm_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_strmm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B as *mut f32,
+        ldb,
+    ))
 }
+
 unsafe fn ctrmm_v2(
     handle: cublasHandle_t,
     side: cublasSideMode_t,
@@ -4156,7 +5541,24 @@ unsafe fn ctrmm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ctrmm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        (B as *mut cuComplex).cast(),
+        ldb,
+    ))
 }
 
 unsafe fn ztrmm_v2(
@@ -4175,7 +5577,24 @@ unsafe fn ztrmm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let fillMode = to_fill(uplo);
+    let side_mode = to_side(side);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ztrmm(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        (B as *mut cuDoubleComplex).cast(),
+        ldb,
+    ))
 }
 
 unsafe fn sgemm_batched(
@@ -4195,7 +5614,25 @@ unsafe fn sgemm_batched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_sgemm_batched(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha,
+        Aarray,
+        lda,
+        Barray,
+        ldb,
+        beta,
+        Carray,
+        ldc,
+        batchCount,
+    ))
 }
 
 unsafe fn dgemm_batched(
@@ -4215,7 +5652,25 @@ unsafe fn dgemm_batched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_dgemm_batched(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha,
+        Aarray,
+        lda,
+        Barray,
+        ldb,
+        beta,
+        Carray,
+        ldc,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemm_batched(
@@ -4235,7 +5690,25 @@ unsafe fn cgemm_batched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_cgemm_batched(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha.cast(),
+        Aarray.cast(),
+        lda,
+        Barray.cast(),
+        ldb,
+        beta.cast(),
+        Carray.cast(),
+        ldc,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemm3m_batched(
@@ -4255,7 +5728,7 @@ unsafe fn cgemm3m_batched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn zgemm_batched(
@@ -4275,7 +5748,25 @@ unsafe fn zgemm_batched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_zgemm_batched(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        k,
+        alpha.cast(),
+        Aarray.cast(),
+        lda,
+        Barray.cast(),
+        ldb,
+        beta.cast(),
+        Carray.cast(),
+        ldc,
+        batchCount,
+    ))
 }
 
 unsafe fn cgemm3m_strided_batched(
@@ -4298,7 +5789,7 @@ unsafe fn cgemm3m_strided_batched(
     strideC: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn dgeam(
@@ -4316,7 +5807,23 @@ unsafe fn dgeam(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_dgeam(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        beta,
+        B,
+        ldb,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn cgeam(
@@ -4334,7 +5841,23 @@ unsafe fn cgeam(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_cgeam(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        beta.cast(),
+        B.cast(),
+        ldb,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zgeam(
@@ -4352,7 +5875,23 @@ unsafe fn zgeam(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let op_a = op_from_cuda(transa);
+    let op_b = op_from_cuda(transb);
+    to_cuda(rocblas_zgeam(
+        handle.cast(),
+        op_a,
+        op_b,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        beta.cast(),
+        B.cast(),
+        ldb,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn sgetrf_batched(
@@ -4364,7 +5903,29 @@ unsafe fn sgetrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if !P.is_null() {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_sgetrf_batched(
+            handle.cast(),
+            n,
+            n,
+            A,
+            lda,
+            P,
+            n.into(),
+            info,
+            batchSize,
+        ))
+    } else {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_sgetrf_npvt_batched(
+            handle.cast(),
+            n,
+            n,
+            A,
+            lda,
+            info,
+            batchSize,
+        ))
+    }
 }
 
 unsafe fn dgetrf_batched(
@@ -4376,7 +5937,29 @@ unsafe fn dgetrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if !P.is_null() {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_dgetrf_batched(
+            handle.cast(),
+            n,
+            n,
+            A,
+            lda,
+            P,
+            n.into(),
+            info,
+            batchSize,
+        ))
+    } else {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_dgetrf_npvt_batched(
+            handle.cast(),
+            n,
+            n,
+            A,
+            lda,
+            info,
+            batchSize,
+        ))
+    }
 }
 
 unsafe fn sgetri_batched(
@@ -4390,7 +5973,31 @@ unsafe fn sgetri_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if !P.is_null() {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_sgetri_outofplace_batched(
+            handle.cast(),
+            n,
+            A as *mut *mut f32,
+            lda,
+            P as *mut ::std::os::raw::c_int,
+            n.into(),
+            C,
+            ldc,
+            info,
+            batchSize,
+        ))
+    } else {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_sgetri_npvt_outofplace_batched(
+            handle.cast(),
+            n,
+            A as *mut *mut f32,
+            lda,
+            C,
+            n,
+            info,
+            batchSize,
+        ))
+    }
 }
 
 unsafe fn dgetri_batched(
@@ -4404,7 +6011,31 @@ unsafe fn dgetri_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if !P.is_null() {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_dgetri_outofplace_batched(
+            handle.cast(),
+            n,
+            A as *mut *mut f64,
+            lda,
+            P as *mut ::std::os::raw::c_int,
+            n.into(),
+            C,
+            ldc,
+            info,
+            batchSize,
+        ))
+    } else {
+        rocsolver_to_cuda(rocsolver_sys::rocsolver_dgetri_npvt_outofplace_batched(
+            handle.cast(),
+            n,
+            A as *mut *mut f64,
+            lda,
+            C,
+            n,
+            info,
+            batchSize,
+        ))
+    }
 }
 unsafe fn sgetrs_batched(
     handle: cublasHandle_t,
@@ -4419,7 +6050,47 @@ unsafe fn sgetrs_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if n > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N
+        && trans != cublasOperation_t::CUBLAS_OP_T
+        && trans != cublasOperation_t::CUBLAS_OP_C
+    {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if nrhs < 0 {
+        *info = -3;
+    } else if Aarray.is_null() && n != 0 {
+        *info = -4;
+    } else if lda < max {
+        *info = -5;
+    } else if devIpiv.is_null() && n != 0 {
+        *info = -6;
+    } else if Barray.is_null() && n * nrhs != 0 {
+        *info = -7;
+    } else if ldb < max {
+        *info = -8;
+    } else if batchSize < 0 {
+        *info = -10
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_sgetrs_batched(
+        handle.cast(),
+        op,
+        n,
+        nrhs,
+        Aarray as *mut *mut f32,
+        lda,
+        devIpiv,
+        n.into(),
+        Barray,
+        ldb,
+        batchSize,
+    ))
 }
 
 unsafe fn dgetrs_batched(
@@ -4435,7 +6106,47 @@ unsafe fn dgetrs_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if n > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N
+        && trans != cublasOperation_t::CUBLAS_OP_T
+        && trans != cublasOperation_t::CUBLAS_OP_C
+    {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if nrhs < 0 {
+        *info = -3;
+    } else if Aarray.is_null() && n != 0 {
+        *info = -4;
+    } else if lda < max {
+        *info = -5;
+    } else if devIpiv.is_null() && n != 0 {
+        *info = -6;
+    } else if Barray.is_null() && n * nrhs != 0 {
+        *info = -7;
+    } else if ldb < max {
+        *info = -8;
+    } else if batchSize < 0 {
+        *info = -10
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_dgetrs_batched(
+        handle.cast(),
+        op,
+        n,
+        nrhs,
+        Aarray as *mut *mut f64,
+        lda,
+        devIpiv,
+        n.into(),
+        Barray,
+        ldb,
+        batchSize,
+    ))
 }
 
 unsafe fn cgetrs_batched(
@@ -4451,7 +6162,47 @@ unsafe fn cgetrs_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if n > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N
+        && trans != cublasOperation_t::CUBLAS_OP_T
+        && trans != cublasOperation_t::CUBLAS_OP_C
+    {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if nrhs < 0 {
+        *info = -3;
+    } else if Aarray.is_null() && n != 0 {
+        *info = -4;
+    } else if lda < max {
+        *info = -5;
+    } else if devIpiv.is_null() && n != 0 {
+        *info = -6;
+    } else if Barray.is_null() && n * nrhs != 0 {
+        *info = -7;
+    } else if ldb < max {
+        *info = -8;
+    } else if batchSize < 0 {
+        *info = -10
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_cgetrs_batched(
+        handle.cast(),
+        op,
+        n,
+        nrhs,
+        Aarray.cast(),
+        lda,
+        devIpiv,
+        n.into(),
+        Barray.cast(),
+        ldb,
+        batchSize,
+    ))
 }
 
 unsafe fn zgetrs_batched(
@@ -4467,7 +6218,47 @@ unsafe fn zgetrs_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if n > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N
+        && trans != cublasOperation_t::CUBLAS_OP_T
+        && trans != cublasOperation_t::CUBLAS_OP_C
+    {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if nrhs < 0 {
+        *info = -3;
+    } else if Aarray.is_null() && n != 0 {
+        *info = -4;
+    } else if lda < max {
+        *info = -5;
+    } else if devIpiv.is_null() && n != 0 {
+        *info = -6;
+    } else if Barray.is_null() && n * nrhs != 0 {
+        *info = -7;
+    } else if ldb < max {
+        *info = -8;
+    } else if batchSize < 0 {
+        *info = -10
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_cgetrs_batched(
+        handle.cast(),
+        op,
+        n,
+        nrhs,
+        Aarray.cast(),
+        lda,
+        devIpiv,
+        n.into(),
+        Barray.cast(),
+        ldb,
+        batchSize,
+    ))
 }
 
 unsafe fn strsm_batched(
@@ -4485,7 +6276,25 @@ unsafe fn strsm_batched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(side);
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_strsm_batched(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        batchCount,
+    ))
 }
 
 unsafe fn dtrsm_batched(
@@ -4503,7 +6312,25 @@ unsafe fn dtrsm_batched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(side);
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_dtrsm_batched(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha,
+        A,
+        lda,
+        B,
+        ldb,
+        batchCount,
+    ))
 }
 
 unsafe fn ctrsm_batched(
@@ -4521,7 +6348,25 @@ unsafe fn ctrsm_batched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(side);
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ctrsm_batched(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        batchCount,
+    ))
 }
 
 unsafe fn ztrsm_batched(
@@ -4539,7 +6384,25 @@ unsafe fn ztrsm_batched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(side);
+    let fillMode = to_fill(uplo);
+    let op = op_from_cuda(trans);
+    let diag_type = to_diag(diag);
+    to_cuda(rocblas_ztrsm_batched(
+        handle.cast(),
+        side_mode,
+        fillMode,
+        op,
+        diag_type,
+        m,
+        n,
+        alpha.cast(),
+        A.cast(),
+        lda,
+        B.cast(),
+        ldb,
+        batchCount,
+    ))
 }
 
 unsafe fn smatinv_batched(
@@ -4552,7 +6415,7 @@ unsafe fn smatinv_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn dmatinv_batched(
@@ -4565,7 +6428,7 @@ unsafe fn dmatinv_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn cmatinv_batched(
@@ -4578,7 +6441,7 @@ unsafe fn cmatinv_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn zmatinv_batched(
@@ -4591,7 +6454,7 @@ unsafe fn zmatinv_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn sgeqrf_batched(
@@ -4604,7 +6467,33 @@ unsafe fn sgeqrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if m > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if m < 0 {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -3;
+    } else if lda < max {
+        *info = -4;
+    } else if TauArray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if batchSize < 0 {
+        *info = -7;
+    } else {
+        *info = 0;
+    }
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_sgeqrf_ptr_batched(
+        handle.cast(),
+        m,
+        n,
+        Aarray,
+        lda,
+        TauArray as _,
+        batchSize,
+    ))
 }
 
 unsafe fn dgeqrf_batched(
@@ -4617,7 +6506,33 @@ unsafe fn dgeqrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if m > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if m < 0 {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -3;
+    } else if lda < max {
+        *info = -4;
+    } else if TauArray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if batchSize < 0 {
+        *info = -7;
+    } else {
+        *info = 0;
+    }
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_dgeqrf_ptr_batched(
+        handle.cast(),
+        m,
+        n,
+        Aarray,
+        lda,
+        TauArray as _,
+        batchSize,
+    ))
 }
 
 unsafe fn cgeqrf_batched(
@@ -4630,7 +6545,33 @@ unsafe fn cgeqrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if m > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if m < 0 {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -3;
+    } else if lda < max {
+        *info = -4;
+    } else if TauArray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if batchSize < 0 {
+        *info = -7;
+    } else {
+        *info = 0;
+    }
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_cgeqrf_ptr_batched(
+        handle.cast(),
+        m,
+        n,
+        Aarray.cast(),
+        lda,
+        TauArray as _,
+        batchSize,
+    ))
 }
 
 unsafe fn zgeqrf_batched(
@@ -4643,7 +6584,33 @@ unsafe fn zgeqrf_batched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let max = if m > 1 { n } else { 1 };
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if m < 0 {
+        *info = -1;
+    } else if n < 0 {
+        *info = -2;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -3;
+    } else if lda < max {
+        *info = -4;
+    } else if TauArray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if batchSize < 0 {
+        *info = -7;
+    } else {
+        *info = 0;
+    }
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_cgeqrf_ptr_batched(
+        handle.cast(),
+        m,
+        n,
+        Aarray.cast(),
+        lda,
+        TauArray as _,
+        batchSize,
+    ))
 }
 
 unsafe fn sgels_batched(
@@ -4660,7 +6627,45 @@ unsafe fn sgels_batched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N && trans != cublasOperation_t::CUBLAS_OP_T {
+        *info = -1;
+    } else if m < 0 {
+        *info = -2;
+    } else if n < 0 {
+        *info = -3;
+    } else if nrhs < 0 {
+        *info = -4;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if lda < m {
+        *info = -6;
+    } else if Carray.is_null() && (m * nrhs != 0 || n * nrhs != 0) {
+        *info = -7;
+    } else if ldc < m || ldc < n {
+        *info = -8;
+    } else if devInfoArray.is_null() && batchSize != 0 {
+        *info = -10;
+    } else if batchSize < 0 {
+        *info = -11;
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_sgels_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        devInfoArray,
+        batchSize,
+    ))
 }
 
 unsafe fn dgels_batched(
@@ -4677,7 +6682,45 @@ unsafe fn dgels_batched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N && trans != cublasOperation_t::CUBLAS_OP_T {
+        *info = -1;
+    } else if m < 0 {
+        *info = -2;
+    } else if n < 0 {
+        *info = -3;
+    } else if nrhs < 0 {
+        *info = -4;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if lda < m {
+        *info = -6;
+    } else if Carray.is_null() && (m * nrhs != 0 || n * nrhs != 0) {
+        *info = -7;
+    } else if ldc < m || ldc < n {
+        *info = -8;
+    } else if devInfoArray.is_null() && batchSize != 0 {
+        *info = -10;
+    } else if batchSize < 0 {
+        *info = -11;
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_dgels_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        devInfoArray,
+        batchSize,
+    ))
 }
 
 unsafe fn cgels_batched(
@@ -4694,7 +6737,45 @@ unsafe fn cgels_batched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N && trans != cublasOperation_t::CUBLAS_OP_T {
+        *info = -1;
+    } else if m < 0 {
+        *info = -2;
+    } else if n < 0 {
+        *info = -3;
+    } else if nrhs < 0 {
+        *info = -4;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if lda < m {
+        *info = -6;
+    } else if Carray.is_null() && (m * nrhs != 0 || n * nrhs != 0) {
+        *info = -7;
+    } else if ldc < m || ldc < n {
+        *info = -8;
+    } else if devInfoArray.is_null() && batchSize != 0 {
+        *info = -10;
+    } else if batchSize < 0 {
+        *info = -11;
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_cgels_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        nrhs,
+        Aarray.cast(),
+        lda,
+        Carray.cast(),
+        ldc,
+        devInfoArray,
+        batchSize,
+    ))
 }
 
 unsafe fn zgels_batched(
@@ -4711,7 +6792,45 @@ unsafe fn zgels_batched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    if info.is_null() {
+        return cublasStatus_t::CUBLAS_STATUS_INVALID_VALUE;
+    } else if trans != cublasOperation_t::CUBLAS_OP_N && trans != cublasOperation_t::CUBLAS_OP_T {
+        *info = -1;
+    } else if m < 0 {
+        *info = -2;
+    } else if n < 0 {
+        *info = -3;
+    } else if nrhs < 0 {
+        *info = -4;
+    } else if Aarray.is_null() && m * n != 0 {
+        *info = -5;
+    } else if lda < m {
+        *info = -6;
+    } else if Carray.is_null() && (m * nrhs != 0 || n * nrhs != 0) {
+        *info = -7;
+    } else if ldc < m || ldc < n {
+        *info = -8;
+    } else if devInfoArray.is_null() && batchSize != 0 {
+        *info = -10;
+    } else if batchSize < 0 {
+        *info = -11;
+    } else {
+        *info = 0;
+    }
+    let op = rocsolver_op_from_cuda(trans);
+    rocsolver_to_cuda(rocsolver_sys::rocsolver_zgels_batched(
+        handle.cast(),
+        op,
+        m,
+        n,
+        nrhs,
+        Aarray.cast(),
+        lda,
+        Carray.cast(),
+        ldc,
+        devInfoArray,
+        batchSize,
+    ))
 }
 
 unsafe fn sdgmm(
@@ -4726,7 +6845,19 @@ unsafe fn sdgmm(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(mode);
+    to_cuda(rocblas_sdgmm(
+        handle.cast(),
+        side_mode,
+        m,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn ddgmm(
@@ -4741,7 +6872,19 @@ unsafe fn ddgmm(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(mode);
+    to_cuda(rocblas_ddgmm(
+        handle.cast(),
+        side_mode,
+        m,
+        n,
+        A,
+        lda,
+        x,
+        incx,
+        C,
+        ldc,
+    ))
 }
 
 unsafe fn cdgmm(
@@ -4756,7 +6899,19 @@ unsafe fn cdgmm(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(mode);
+    to_cuda(rocblas_cdgmm(
+        handle.cast(),
+        side_mode,
+        m,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn zdgmm(
@@ -4771,7 +6926,19 @@ unsafe fn zdgmm(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    let side_mode = to_side(mode);
+    to_cuda(rocblas_cdgmm(
+        handle.cast(),
+        side_mode,
+        m,
+        n,
+        A.cast(),
+        lda,
+        x.cast(),
+        incx,
+        C.cast(),
+        ldc,
+    ))
 }
 
 unsafe fn stpttr(
@@ -4782,7 +6949,7 @@ unsafe fn stpttr(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn dtpttr(
@@ -4793,7 +6960,7 @@ unsafe fn dtpttr(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ctpttr(
@@ -4804,7 +6971,7 @@ unsafe fn ctpttr(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ztpttr(
@@ -4815,7 +6982,7 @@ unsafe fn ztpttr(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn strttp(
@@ -4826,7 +6993,7 @@ unsafe fn strttp(
     lda: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn dtrttp(
@@ -4837,7 +7004,7 @@ unsafe fn dtrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ctrttp(
@@ -4848,7 +7015,7 @@ unsafe fn ctrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 unsafe fn ztrttp(
@@ -4859,33 +7026,5 @@ unsafe fn ztrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn shutdown() -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn get_error() -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn get_version(version: *mut ::std::os::raw::c_int) -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn alloc(
-    n: ::std::os::raw::c_int,
-    elemSize: ::std::os::raw::c_int,
-    devicePtr: *mut *mut ::std::os::raw::c_void,
-) -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn free(devicePtr: *mut ::std::os::raw::c_void) -> cublasStatus_t {
-    crate::unsupported()
-}
-
-unsafe fn set_kernel_stream(stream: cudaStream_t) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
