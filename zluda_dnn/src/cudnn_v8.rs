@@ -4,7 +4,7 @@ use crate::types::*;
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnGetVersion() -> usize {
-    unimplemented!()
+    8970usize
 }
 
 #[no_mangle]
@@ -21,7 +21,44 @@ pub unsafe extern "system" fn cudnnGetCudartVersion() -> usize {
 pub unsafe extern "system" fn cudnnGetErrorString(
     status: cudnnStatus_t,
 ) -> *const ::std::os::raw::c_char {
-    unimplemented!()
+    match status {
+        cudnnStatus_t::CUDNN_STATUS_SUCCESS => b"CUDNN_STATUS_SUCCESS\0".as_ptr().cast(),
+        cudnnStatus_t::CUDNN_STATUS_NOT_INITIALIZED => {
+            b"CUDNN_STATUS_NOT_INITIALIZED\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_ALLOC_FAILED => b"CUDNN_STATUS_ALLOC_FAILED\0".as_ptr().cast(),
+        cudnnStatus_t::CUDNN_STATUS_BAD_PARAM => b"CUDNN_STATUS_BAD_PARAM\0".as_ptr().cast(),
+        cudnnStatus_t::CUDNN_STATUS_ARCH_MISMATCH => {
+            b"CUDNN_STATUS_ARCH_MISMATCH\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_MAPPING_ERROR => {
+            b"CUDNN_STATUS_MAPPING_ERROR\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_EXECUTION_FAILED => {
+            b"CUDNN_STATUS_EXECUTION_FAILED\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_INTERNAL_ERROR => {
+            b"CUDNN_STATUS_INTERNAL_ERROR\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED => {
+            b"CUDNN_STATUS_NOT_SUPPORTED\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_LICENSE_ERROR => {
+            b"CUDNN_STATUS_LICENSE_ERROR\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_RUNTIME_PREREQUISITE_MISSING => {
+            b"CUDNN_STATUS_RUNTIME_PREREQUISITE_MISSING\0"
+                .as_ptr()
+                .cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_RUNTIME_IN_PROGRESS => {
+            b"CUDNN_STATUS_RUNTIME_IN_PROGRESS\0".as_ptr().cast()
+        }
+        cudnnStatus_t::CUDNN_STATUS_RUNTIME_FP_OVERFLOW => {
+            b"CUDNN_STATUS_RUNTIME_FP_OVERFLOW\0".as_ptr().cast()
+        }
+        _ => panic!(),
+    }
 }
 
 #[no_mangle]
@@ -31,7 +68,7 @@ pub unsafe extern "system" fn cudnnQueryRuntimeError(
     mode: cudnnErrQueryMode_t,
     tag: *mut cudnnRuntimeTag_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -39,7 +76,7 @@ pub unsafe extern "system" fn cudnnGetProperty(
     type_: libraryPropertyType,
     value: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -65,7 +102,7 @@ pub unsafe extern "system" fn cudnnGetStream(
     handle: cudnnHandle_t,
     streamId: *mut cudaStream_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_stream(handle, streamId)
 }
 
 #[no_mangle]
@@ -85,7 +122,7 @@ pub unsafe extern "system" fn cudnnSetTensor4dDescriptor(
     h: ::std::os::raw::c_int,
     w: ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_tensor4d_descriptor(tensorDesc, format, dataType, n, c, h, w)
 }
 
 #[no_mangle]
@@ -119,7 +156,9 @@ pub unsafe extern "system" fn cudnnGetTensor4dDescriptor(
     hStride: *mut ::std::os::raw::c_int,
     wStride: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_tensor4d_descriptor(
+        tensorDesc, dataType, n, c, h, w, nStride, cStride, hStride, wStride,
+    )
 }
 
 #[no_mangle]
@@ -141,7 +180,7 @@ pub unsafe extern "system" fn cudnnSetTensorNdDescriptorEx(
     nbDims: ::std::os::raw::c_int,
     dimA: *const ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -153,7 +192,7 @@ pub unsafe extern "system" fn cudnnGetTensorNdDescriptor(
     dimA: *mut ::std::os::raw::c_int,
     strideA: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_tensor_nd_descriptor(tensorDesc, nbDimsRequested, dataType, nbDims, dimA, strideA)
 }
 
 #[no_mangle]
@@ -161,7 +200,7 @@ pub unsafe extern "system" fn cudnnGetTensorSizeInBytes(
     tensorDesc: cudnnTensorDescriptor_t,
     size: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -178,14 +217,14 @@ pub unsafe extern "system" fn cudnnInitTransformDest(
     destDesc: cudnnTensorDescriptor_t,
     destSizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnCreateTensorTransformDescriptor(
     transformDesc: *mut cudnnTensorTransformDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -198,7 +237,7 @@ pub unsafe extern "system" fn cudnnSetTensorTransformDescriptor(
     foldA: *const u32,
     direction: cudnnFoldingDirection_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -211,14 +250,14 @@ pub unsafe extern "system" fn cudnnGetTensorTransformDescriptor(
     foldA: *mut u32,
     direction: *mut cudnnFoldingDirection_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnDestroyTensorTransformDescriptor(
     transformDesc: cudnnTensorTransformDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -245,7 +284,7 @@ pub unsafe extern "system" fn cudnnTransformTensorEx(
     destDesc: cudnnTensorDescriptor_t,
     destData: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -265,7 +304,7 @@ pub unsafe extern "system" fn cudnnAddTensor(
 pub unsafe extern "system" fn cudnnCreateOpTensorDescriptor(
     opTensorDesc: *mut cudnnOpTensorDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::create_op_tensor_descriptor(opTensorDesc)
 }
 
 #[no_mangle]
@@ -275,7 +314,7 @@ pub unsafe extern "system" fn cudnnSetOpTensorDescriptor(
     opTensorCompType: cudnnDataType_t,
     opTensorNanOpt: cudnnNanPropagation_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_op_tensor_descriptor(opTensorDesc, opTensorOp, opTensorCompType, opTensorNanOpt)
 }
 
 #[no_mangle]
@@ -285,14 +324,14 @@ pub unsafe extern "system" fn cudnnGetOpTensorDescriptor(
     opTensorCompType: *mut cudnnDataType_t,
     opTensorNanOpt: *mut cudnnNanPropagation_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_op_tensor_descriptor(opTensorDesc, opTensorOp, opTensorCompType, opTensorNanOpt)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnDestroyOpTensorDescriptor(
     opTensorDesc: cudnnOpTensorDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::destroy_op_tensor_descriptor(opTensorDesc)
 }
 
 #[no_mangle]
@@ -316,7 +355,7 @@ pub unsafe extern "system" fn cudnnOpTensor(
 pub unsafe extern "system" fn cudnnCreateReduceTensorDescriptor(
     reduceTensorDesc: *mut cudnnReduceTensorDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::create_reduce_tensor_descriptor(reduceTensorDesc)
 }
 
 #[no_mangle]
@@ -328,7 +367,14 @@ pub unsafe extern "system" fn cudnnSetReduceTensorDescriptor(
     reduceTensorIndices: cudnnReduceTensorIndices_t,
     reduceTensorIndicesType: cudnnIndicesType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_reduce_tensor_descriptor(
+        reduceTensorDesc,
+        reduceTensorOp,
+        reduceTensorCompType,
+        reduceTensorNanOpt,
+        reduceTensorIndices,
+        reduceTensorIndicesType,
+    )
 }
 
 #[no_mangle]
@@ -340,14 +386,21 @@ pub unsafe extern "system" fn cudnnGetReduceTensorDescriptor(
     reduceTensorIndices: *mut cudnnReduceTensorIndices_t,
     reduceTensorIndicesType: *mut cudnnIndicesType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_reduce_tensor_descriptor(
+        reduceTensorDesc,
+        reduceTensorOp,
+        reduceTensorCompType,
+        reduceTensorNanOpt,
+        reduceTensorIndices,
+        reduceTensorIndicesType,
+    )
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnDestroyReduceTensorDescriptor(
     reduceTensorDesc: cudnnReduceTensorDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::destroy_reduce_tensor_descriptor(reduceTensorDesc)
 }
 
 #[no_mangle]
@@ -358,7 +411,7 @@ pub unsafe extern "system" fn cudnnGetReductionIndicesSize(
     cDesc: cudnnTensorDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_reduction_indices_size(handle, reduceTensorDesc, aDesc, cDesc, sizeInBytes)
 }
 
 #[no_mangle]
@@ -369,7 +422,7 @@ pub unsafe extern "system" fn cudnnGetReductionWorkspaceSize(
     cDesc: cudnnTensorDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_reduction_workspace_size(handle, reduceTensorDesc, aDesc, cDesc, sizeInBytes)
 }
 
 #[no_mangle]
@@ -387,7 +440,20 @@ pub unsafe extern "system" fn cudnnReduceTensor(
     cDesc: cudnnTensorDescriptor_t,
     C: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::reduce_tensor(
+        handle,
+        reduceTensorDesc,
+        indices,
+        indicesSizeInBytes,
+        workspace,
+        workspaceSizeInBytes,
+        alpha,
+        aDesc,
+        A,
+        beta,
+        cDesc,
+        C,
+    )
 }
 
 #[no_mangle]
@@ -397,7 +463,7 @@ pub unsafe extern "system" fn cudnnSetTensor(
     y: *mut ::std::os::raw::c_void,
     valuePtr: *const ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_tensor(handle, yDesc, y, valuePtr)
 }
 
 #[no_mangle]
@@ -407,7 +473,7 @@ pub unsafe extern "system" fn cudnnScaleTensor(
     y: *mut ::std::os::raw::c_void,
     alpha: *const ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::scale_tensor(handle, yDesc, y, alpha)
 }
 
 #[no_mangle]
@@ -529,7 +595,17 @@ pub unsafe extern "system" fn cudnnSetPooling2dDescriptor(
     verticalStride: ::std::os::raw::c_int,
     horizontalStride: ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_pooling_2d_descriptor(
+        poolingDesc,
+        mode,
+        maxpoolingNanOpt,
+        windowHeight,
+        windowWidth,
+        verticalPadding,
+        horizontalPadding,
+        verticalStride,
+        horizontalStride,
+    )
 }
 
 #[no_mangle]
@@ -544,7 +620,17 @@ pub unsafe extern "system" fn cudnnGetPooling2dDescriptor(
     verticalStride: *mut ::std::os::raw::c_int,
     horizontalStride: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_pooling_2d_descriptor(
+        poolingDesc,
+        mode,
+        maxpoolingNanOpt,
+        windowHeight,
+        windowWidth,
+        verticalPadding,
+        horizontalPadding,
+        verticalStride,
+        horizontalStride,
+    )
 }
 
 #[no_mangle]
@@ -579,7 +665,16 @@ pub unsafe extern "system" fn cudnnGetPoolingNdDescriptor(
     paddingA: *mut ::std::os::raw::c_int,
     strideA: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_pooling_nd_descriptor(
+        poolingDesc,
+        nbDimsRequested,
+        mode,
+        maxpoolingNanOpt,
+        nbDims,
+        windowDimA,
+        paddingA,
+        strideA,
+    )
 }
 
 #[no_mangle]
@@ -601,7 +696,7 @@ pub unsafe extern "system" fn cudnnGetPooling2dForwardOutputDim(
     h: *mut ::std::os::raw::c_int,
     w: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_pooling2d_forward_output_dim(poolingDesc, inputTensorDesc, n, c, h, w)
 }
 
 #[no_mangle]
@@ -715,7 +810,7 @@ pub unsafe extern "system" fn cudnnGetLRNDescriptor(
     lrnBeta: *mut f64,
     lrnK: *mut f64,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_lrn_descriptor(normDesc, lrnN, lrnAlpha, lrnBeta, lrnK)
 }
 
 #[no_mangle]
@@ -764,7 +859,7 @@ pub unsafe extern "system" fn cudnnDeriveBNTensorDescriptor(
     xDesc: cudnnTensorDescriptor_t,
     mode: cudnnBatchNormMode_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::derive_bn_tensor_descriptor(derivedBnDesc, xDesc, mode)
 }
 
 #[no_mangle]
@@ -784,7 +879,22 @@ pub unsafe extern "system" fn cudnnBatchNormalizationForwardInference(
     estimatedVariance: *const ::std::os::raw::c_void,
     epsilon: f64,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::batch_normalization_forward_inference(
+        handle,
+        mode,
+        alpha,
+        beta,
+        xDesc,
+        x,
+        yDesc,
+        y,
+        bnScaleBiasMeanVarDesc,
+        bnScale,
+        bnBias,
+        estimatedMean,
+        estimatedVariance,
+        epsilon,
+    )
 }
 
 #[no_mangle]
@@ -879,14 +989,14 @@ pub unsafe extern "system" fn cudnnSpatialTfSamplerForward(
 pub unsafe extern "system" fn cudnnCreateDropoutDescriptor(
     dropoutDesc: *mut cudnnDropoutDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::create_dropout_descriptor(dropoutDesc)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnDestroyDropoutDescriptor(
     dropoutDesc: cudnnDropoutDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::destroy_dropout_descriptor(dropoutDesc)
 }
 
 #[no_mangle]
@@ -894,7 +1004,7 @@ pub unsafe extern "system" fn cudnnDropoutGetStatesSize(
     handle: cudnnHandle_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::dropout_get_states_size(handle, sizeInBytes)
 }
 
 #[no_mangle]
@@ -902,7 +1012,7 @@ pub unsafe extern "system" fn cudnnDropoutGetReserveSpaceSize(
     xdesc: cudnnTensorDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::dropout_get_reserve_space_size(xdesc, sizeInBytes)
 }
 
 #[no_mangle]
@@ -914,7 +1024,7 @@ pub unsafe extern "system" fn cudnnSetDropoutDescriptor(
     stateSizeInBytes: usize,
     seed: ::std::os::raw::c_ulonglong,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_dropout_descriptor(dropoutDesc, handle, dropout, states, stateSizeInBytes, seed)
 }
 
 #[no_mangle]
@@ -926,7 +1036,7 @@ pub unsafe extern "system" fn cudnnRestoreDropoutDescriptor(
     stateSizeInBytes: usize,
     seed: ::std::os::raw::c_ulonglong,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::restore_dropout_descriptor(dropoutDesc, handle, dropout, states, stateSizeInBytes, seed)
 }
 
 #[no_mangle]
@@ -937,7 +1047,7 @@ pub unsafe extern "system" fn cudnnGetDropoutDescriptor(
     states: *mut *mut ::std::os::raw::c_void,
     seed: *mut ::std::os::raw::c_ulonglong,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_dropout_descriptor(dropoutDesc, handle, dropout, states, seed)
 }
 
 #[no_mangle]
@@ -951,7 +1061,16 @@ pub unsafe extern "system" fn cudnnDropoutForward(
     reserveSpace: *mut ::std::os::raw::c_void,
     reserveSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::dropout_forward(
+        handle,
+        dropoutDesc,
+        xdesc,
+        x,
+        ydesc,
+        y,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -1096,7 +1215,9 @@ pub unsafe extern "system" fn cudnnSoftmaxBackward(
     dxDesc: cudnnTensorDescriptor_t,
     dx: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::softmax_backward(
+        handle, algo, mode, alpha, yDesc, y, dyDesc, dy, beta, dxDesc, dx,
+    )
 }
 
 #[no_mangle]
@@ -1132,7 +1253,20 @@ pub unsafe extern "system" fn cudnnActivationBackward(
     dxDesc: cudnnTensorDescriptor_t,
     dx: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::activation_backward(
+        handle,
+        activationDesc,
+        alpha,
+        yDesc,
+        y,
+        dyDesc,
+        dy,
+        xDesc,
+        x,
+        beta,
+        dxDesc,
+        dx,
+    )
 }
 
 #[no_mangle]
@@ -1238,7 +1372,25 @@ pub unsafe extern "system" fn cudnnBatchNormalizationForwardTraining(
     resultSaveMean: *mut ::std::os::raw::c_void,
     resultSaveInvVariance: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::batch_normalization_forward_training(
+        handle,
+        mode,
+        alpha,
+        beta,
+        xDesc,
+        x,
+        yDesc,
+        y,
+        bnScaleBiasMeanVarDesc,
+        bnScale,
+        bnBias,
+        exponentialAverageFactor,
+        resultRunningMean,
+        resultRunningVariance,
+        epsilon,
+        resultSaveMean,
+        resultSaveInvVariance,
+    )
 }
 
 #[no_mangle]
@@ -1294,7 +1446,27 @@ pub unsafe extern "system" fn cudnnBatchNormalizationBackward(
     savedMean: *const ::std::os::raw::c_void,
     savedInvVariance: *const ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::batch_normalization_backward(
+        handle,
+        mode,
+        alphaDataDiff,
+        betaDataDiff,
+        alphaParamDiff,
+        betaParamDiff,
+        xDesc,
+        x,
+        dyDesc,
+        dy,
+        dxDesc,
+        dx,
+        dBnScaleBiasDesc,
+        bnScale,
+        dBnScaleResult,
+        dBnBiasResult,
+        epsilon,
+        savedMean,
+        savedInvVariance,
+    )
 }
 
 #[no_mangle]
@@ -1499,7 +1671,16 @@ pub unsafe extern "system" fn cudnnDropoutBackward(
     reserveSpace: *mut ::std::os::raw::c_void,
     reserveSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::dropout_backward(
+        handle,
+        dropoutDesc,
+        dydesc,
+        dy,
+        dxdesc,
+        dx,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -1511,14 +1692,14 @@ pub unsafe extern "system" fn cudnnOpsTrainVersionCheck() -> cudnnStatus_t {
 pub unsafe extern "system" fn cudnnCreateRNNDescriptor(
     rnnDesc: *mut cudnnRNNDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::create_rnn_descriptor(rnnDesc)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cudnnDestroyRNNDescriptor(
     rnnDesc: cudnnRNNDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::destroy_rnn_descriptor(rnnDesc)
 }
 
 #[no_mangle]
@@ -1735,7 +1916,7 @@ pub unsafe extern "system" fn cudnnGetRNNWorkspaceSize(
     xDesc: *const cudnnTensorDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_rnn_workspace_size(handle, rnnDesc, seqLength, xDesc, sizeInBytes)
 }
 
 #[no_mangle]
@@ -1746,7 +1927,7 @@ pub unsafe extern "system" fn cudnnGetRNNTrainingReserveSize(
     xDesc: *const cudnnTensorDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_rnn_training_reserve_size(handle, rnnDesc, seqLength, xDesc, sizeInBytes)
 }
 
 #[no_mangle]
@@ -1769,7 +1950,7 @@ pub unsafe extern "system" fn cudnnGetRNNParamsSize(
     sizeInBytes: *mut usize,
     dataType: cudnnDataType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_rnn_params_size(handle, rnnDesc, xDesc, sizeInBytes, dataType)
 }
 
 #[no_mangle]
@@ -1849,7 +2030,27 @@ pub unsafe extern "system" fn cudnnRNNForwardInference(
     workSpace: *mut ::std::os::raw::c_void,
     workSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::rnn_forward_inference(
+        handle,
+        rnnDesc,
+        seqLength,
+        xDesc,
+        x,
+        hxDesc,
+        hx,
+        cxDesc,
+        cx,
+        wDesc,
+        w,
+        yDesc,
+        y,
+        hyDesc,
+        hy,
+        cyDesc,
+        cy,
+        workSpace,
+        workSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2207,7 +2408,29 @@ pub unsafe extern "system" fn cudnnRNNForwardTraining(
     reserveSpace: *mut ::std::os::raw::c_void,
     reserveSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::rnn_forward_training(
+        handle,
+        rnnDesc,
+        seqLength,
+        xDesc,
+        x,
+        hxDesc,
+        hx,
+        cxDesc,
+        cx,
+        wDesc,
+        w,
+        yDesc,
+        y,
+        hyDesc,
+        hy,
+        cyDesc,
+        cy,
+        workSpace,
+        workSpaceSizeInBytes,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2240,7 +2463,35 @@ pub unsafe extern "system" fn cudnnRNNBackwardData(
     reserveSpace: *mut ::std::os::raw::c_void,
     reserveSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::rnn_backward_data(
+        handle,
+        rnnDesc,
+        seqLength,
+        yDesc,
+        y,
+        dyDesc,
+        dy,
+        dhyDesc,
+        dhy,
+        dcyDesc,
+        dcy,
+        wDesc,
+        w,
+        hxDesc,
+        hx,
+        cxDesc,
+        cx,
+        dxDesc,
+        dx,
+        dhxDesc,
+        dhx,
+        dcxDesc,
+        dcx,
+        workSpace,
+        workSpaceSizeInBytes,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2289,7 +2540,23 @@ pub unsafe extern "system" fn cudnnRNNBackwardWeights(
     reserveSpace: *const ::std::os::raw::c_void,
     reserveSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::rnn_backward_weights(
+        handle,
+        rnnDesc,
+        seqLength,
+        xDesc,
+        x,
+        hxDesc,
+        hx,
+        yDesc,
+        y,
+        workSpace,
+        workSpaceSizeInBytes,
+        dwDesc,
+        dw,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2581,7 +2848,7 @@ pub unsafe extern "system" fn cudnnMultiHeadAttnBackwardWeights(
 pub unsafe extern "system" fn cudnnCreateCTCLossDescriptor(
     ctcLossDesc: *mut cudnnCTCLossDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::create_ctc_loss_descriptor(ctcLossDesc)
 }
 
 #[no_mangle]
@@ -2589,7 +2856,7 @@ pub unsafe extern "system" fn cudnnSetCTCLossDescriptor(
     ctcLossDesc: cudnnCTCLossDescriptor_t,
     compType: cudnnDataType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::set_ctc_loss_descriptor(ctcLossDesc, compType)
 }
 
 #[no_mangle]
@@ -2618,7 +2885,7 @@ pub unsafe extern "system" fn cudnnGetCTCLossDescriptor(
     ctcLossDesc: cudnnCTCLossDescriptor_t,
     compType: *mut cudnnDataType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_ctc_loss_descriptor(ctcLossDesc, compType)
 }
 
 #[no_mangle]
@@ -2646,7 +2913,7 @@ pub unsafe extern "system" fn cudnnGetCTCLossDescriptor_v8(
 pub unsafe extern "system" fn cudnnDestroyCTCLossDescriptor(
     ctcLossDesc: cudnnCTCLossDescriptor_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::destroy_ctc_loss_descriptor(ctcLossDesc)
 }
 
 #[no_mangle]
@@ -2665,7 +2932,21 @@ pub unsafe extern "system" fn cudnnCTCLoss(
     workspace: *mut ::std::os::raw::c_void,
     workSpaceSizeInBytes: usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::ctc_loss(
+        handle,
+        probsDesc,
+        probs,
+        hostLabels,
+        hostLabelLengths,
+        hostInputLengths,
+        costs,
+        gradientsDesc,
+        gradients,
+        algo,
+        ctcLossDesc,
+        workspace,
+        workSpaceSizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2699,7 +2980,17 @@ pub unsafe extern "system" fn cudnnGetCTCLossWorkspaceSize(
     ctcLossDesc: cudnnCTCLossDescriptor_t,
     sizeInBytes: *mut usize,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_ctc_loss_workspace_size(
+        handle,
+        probsDesc,
+        gradientsDesc,
+        labels,
+        labelLengths,
+        inputLengths,
+        algo,
+        ctcLossDesc,
+        sizeInBytes,
+    )
 }
 
 #[no_mangle]
@@ -2856,7 +3147,7 @@ pub unsafe extern "system" fn cudnnGetConvolution2dForwardOutputDim(
     h: *mut ::std::os::raw::c_int,
     w: *mut ::std::os::raw::c_int,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_convolution2d_forward_output_dim(convDesc, inputTensorDesc, filterDesc, n, c, h, w)
 }
 
 #[no_mangle]
@@ -2895,7 +3186,7 @@ pub unsafe extern "system" fn cudnnGetConvolutionForwardAlgorithm_v7(
     returnedAlgoCount: *mut ::std::os::raw::c_int,
     perfResults: *mut cudnnConvolutionFwdAlgoPerf_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -2950,7 +3241,7 @@ pub unsafe extern "system" fn cudnnFindConvolutionForwardAlgorithmEx(
         returnedAlgoCount,
         perfResults,
         workSpace,
-        workSpaceSizeInBytes
+        workSpaceSizeInBytes,
     )
 }
 
@@ -3055,7 +3346,26 @@ pub unsafe extern "system" fn cudnnConvolutionBiasActivationForward(
     yDesc: cudnnTensorDescriptor_t,
     y: *mut ::std::os::raw::c_void,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::convolution_bias_activation_forward(
+        handle,
+        alpha1,
+        xDesc,
+        x,
+        wDesc,
+        w,
+        convDesc,
+        algo,
+        workSpace,
+        workSpaceSizeInBytes,
+        alpha2,
+        zDesc,
+        z,
+        biasDesc,
+        bias,
+        activationDesc,
+        yDesc,
+        y,
+    )
 }
 
 #[no_mangle]

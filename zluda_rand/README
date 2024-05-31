@@ -1,0 +1,2 @@
+bindgen /usr/local/cuda/targets/x86_64-linux/include/curand.h -o src/curand.rs --allowlist-function="^curand.*" --default-enum-style=newtype --no-layout-tests --no-derive-debug -- -I/usr/local/cuda/targets/x86_64-linux/include
+sed -i -e 's/extern "C" {//g' -e 's/-> curandStatus_t;/-> curandStatus_t { crate::unsupported()/g' -e 's/pub fn /#[no_mangle] pub unsafe extern "system" fn /g' src/curand.rs

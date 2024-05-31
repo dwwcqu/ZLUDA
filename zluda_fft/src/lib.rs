@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 #[allow(warnings)]
 mod cufft;
 pub use cufft::*;
@@ -280,11 +281,266 @@ unsafe fn make_plan_1d(
     workSize: *mut usize,
 ) -> cufftResult {
     let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
 
-    if nx < 0 || batch < 0 {
-        return cufftResult::CUFFT_INVALID_VALUE;
+    to_cuda(hipfftMakePlan1d(hip_plan, nx, data_type, batch, workSize))
+}
+
+unsafe fn plan_2d(plan: *mut i32, nx: i32, ny: i32, type_: cufftType) -> cufftResult {
+    let type_ = cuda_type(type_);
+    let mut hip_plan = mem::zeroed();
+    let result = to_cuda(hipfftPlan2d(&mut hip_plan, nx, ny, type_));
+    if result != cufftResult_t::CUFFT_SUCCESS {
+        return result;
     }
-    let lengths: [usize; 1] = [nx as usize];
-    let number_of_transforms: usize = batch as usize;
-    crate::unsupported()
+    let plan_key = {
+        let mut plans = PLANS.lock().unwrap();
+        plans.insert(Plan(hip_plan))
+    };
+    *plan = plan_key as i32;
+    result
+}
+
+unsafe fn make_plan_2d(
+    plan: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+
+    to_cuda(hipfftMakePlan2d(hip_plan, nx, ny, data_type, workSize))
+}
+
+unsafe fn make_plan_3d(
+    plan: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    nz: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+
+    to_cuda(hipfftMakePlan3d(hip_plan, nx, ny, nz, data_type, workSize))
+}
+
+unsafe fn get_size_many_64(
+    plan: cufftHandle,
+    rank: ::std::os::raw::c_int,
+    n: *mut ::std::os::raw::c_longlong,
+    inembed: *mut ::std::os::raw::c_longlong,
+    istride: ::std::os::raw::c_longlong,
+    idist: ::std::os::raw::c_longlong,
+    onembed: *mut ::std::os::raw::c_longlong,
+    ostride: ::std::os::raw::c_longlong,
+    odist: ::std::os::raw::c_longlong,
+    type_: cufftType,
+    batch: ::std::os::raw::c_longlong,
+    work_size: *mut usize,
+) -> cufftResult {
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    let data_type = cuda_type(type_);
+    to_cuda(hipfftGetSizeMany64(
+        hip_plan, rank, n, inembed, istride, idist, onembed, ostride, odist, data_type, batch, work_size,
+    ))
+}
+
+unsafe fn estimate_1d(
+    nx: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    to_cuda(hipfftEstimate1d(nx, data_type, batch, workSize))
+}
+
+unsafe fn estimate_2d(
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    to_cuda(hipfftEstimate2d(nx, ny, data_type, workSize))
+}
+
+unsafe fn estimate_3d(
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    nz: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    to_cuda(hipfftEstimate3d(nx, ny, nz, data_type, workSize))
+}
+
+unsafe fn estimate_many(
+    rank: ::std::os::raw::c_int,
+    n: *mut ::std::os::raw::c_int,
+    inembed: *mut ::std::os::raw::c_int,
+    istride: ::std::os::raw::c_int,
+    idist: ::std::os::raw::c_int,
+    onembed: *mut ::std::os::raw::c_int,
+    ostride: ::std::os::raw::c_int,
+    odist: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    to_cuda(hipfftEstimateMany(
+        rank, n, inembed, istride, idist, onembed, ostride, odist, data_type, batch, workSize,
+    ))
+}
+
+unsafe fn get_size_1d(
+    handle: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(handle) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftGetSize1d(hip_plan, nx, data_type, batch, workSize))
+}
+
+unsafe fn get_size_2d(
+    handle: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(handle) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftGetSize2d(hip_plan, nx, ny, data_type, workSize))
+}
+
+unsafe fn get_size_3d(
+    handle: cufftHandle,
+    nx: ::std::os::raw::c_int,
+    ny: ::std::os::raw::c_int,
+    nz: ::std::os::raw::c_int,
+    type_: cufftType,
+    workSize: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(handle) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftGetSize3d(hip_plan, nx, ny, nz, data_type, workSize))
+}
+
+unsafe fn get_size_many(
+    handle: cufftHandle,
+    rank: ::std::os::raw::c_int,
+    n: *mut ::std::os::raw::c_int,
+    inembed: *mut ::std::os::raw::c_int,
+    istride: ::std::os::raw::c_int,
+    idist: ::std::os::raw::c_int,
+    onembed: *mut ::std::os::raw::c_int,
+    ostride: ::std::os::raw::c_int,
+    odist: ::std::os::raw::c_int,
+    type_: cufftType,
+    batch: ::std::os::raw::c_int,
+    workArea: *mut usize,
+) -> cufftResult {
+    let data_type = cuda_type(type_);
+    let hip_plan = match get_hip_plan(handle) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftGetSizeMany(
+        hip_plan, rank, n, inembed, istride, idist, onembed, ostride, odist, data_type, batch,
+        workArea,
+    ))
+}
+
+unsafe fn get_size(handle: cufftHandle, workSize: *mut usize) -> cufftResult {
+    let hip_plan = match get_hip_plan(handle) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftGetSize(hip_plan, workSize))
+}
+
+unsafe fn set_work_area(plan: cufftHandle, workArea: *mut ::std::os::raw::c_void) -> cufftResult {
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftSetWorkArea(hip_plan, workArea))
+}
+
+unsafe fn set_auto_allocation(
+    plan: cufftHandle,
+    autoAllocate: ::std::os::raw::c_int,
+) -> cufftResult {
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftSetAutoAllocation(hip_plan, autoAllocate))
+}
+
+unsafe fn exec_d2z(
+    plan: cufftHandle,
+    idata: *mut cufftDoubleReal,
+    odata: *mut cufftDoubleComplex,
+) -> cufftResult {
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftExecD2Z(hip_plan, idata.cast(), odata.cast()))
+}
+
+unsafe fn exec_z2d(
+    plan: cufftHandle,
+    idata: *mut cufftDoubleComplex,
+    odata: *mut cufftDoubleReal,
+) -> cufftResult {
+    let hip_plan = match get_hip_plan(plan) {
+        Ok(p) => p,
+        Err(e) => return e,
+    };
+    to_cuda(hipfftExecZ2D(hip_plan, idata.cast(), odata.cast()))
+}
+
+unsafe fn get_version(version: *mut ::std::os::raw::c_int) -> cufftResult {
+    to_cuda(hipfftGetVersion(version))
+}
+
+unsafe fn get_property(
+    type_: libraryPropertyType,
+    value: *mut ::std::os::raw::c_int,
+) -> cufftResult {
+    let lib_type = hipfftLibraryPropertyType(type_.0);
+    to_cuda(hipfftGetProperty(lib_type, value))
 }

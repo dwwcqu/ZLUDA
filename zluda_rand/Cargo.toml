@@ -1,0 +1,20 @@
+[package]
+name = "zluda_rand"
+version = "0.0.0"
+authors = ["dwwdyxiang@gmail.com"]
+edition = "2018"
+
+[lib]
+name = "curand"
+crate-type = ["cdylib"]
+
+[dependencies]
+hiprand-sys = { path = "../hiprand-sys" }
+hip_common = { path = "../hip_common" }
+cuda_types = { path = "../cuda_types" }
+zluda_dark_api = { path = "../zluda_dark_api" }
+
+[package.metadata.zluda]
+linux_only = true
+linux_names = ["libcurand.so.11"]
+dump_names = ["libcurand.so"]

@@ -137,7 +137,7 @@ pub unsafe extern "system" fn cufftPlan2d(
     ny: ::std::os::raw::c_int,
     type_: cufftType,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::plan_2d(plan, nx, ny, type_)
 }
 
 #[no_mangle]
@@ -189,7 +189,7 @@ pub unsafe extern "system" fn cufftMakePlan2d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::make_plan_2d(plan, nx, ny, type_, workSize)
 }
 
 #[no_mangle]
@@ -201,7 +201,7 @@ pub unsafe extern "system" fn cufftMakePlan3d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::make_plan_3d(plan, nx, ny, nz, type_, workSize)
 }
 
 #[no_mangle]
@@ -259,7 +259,9 @@ pub unsafe extern "system" fn cufftGetSizeMany64(
     batch: ::std::os::raw::c_longlong,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size_many_64(
+        plan, rank, n, inembed, istride, idist, onembed, ostride, odist, type_, batch, workSize,
+    )
 }
 
 #[no_mangle]
@@ -269,7 +271,7 @@ pub unsafe extern "system" fn cufftEstimate1d(
     batch: ::std::os::raw::c_int,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::estimate_1d(nx, type_, batch, workSize)
 }
 
 #[no_mangle]
@@ -279,7 +281,7 @@ pub unsafe extern "system" fn cufftEstimate2d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::estimate_2d(nx, ny, type_, workSize)
 }
 
 #[no_mangle]
@@ -290,7 +292,7 @@ pub unsafe extern "system" fn cufftEstimate3d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::estimate_3d(nx, ny, nz, type_, workSize)
 }
 
 #[no_mangle]
@@ -307,7 +309,9 @@ pub unsafe extern "system" fn cufftEstimateMany(
     batch: ::std::os::raw::c_int,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::estimate_many(
+        rank, n, inembed, istride, idist, onembed, ostride, odist, type_, batch, workSize,
+    )
 }
 
 #[no_mangle]
@@ -323,7 +327,7 @@ pub unsafe extern "system" fn cufftGetSize1d(
     batch: ::std::os::raw::c_int,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size_1d(handle, nx, type_, batch, workSize)
 }
 
 #[no_mangle]
@@ -334,7 +338,7 @@ pub unsafe extern "system" fn cufftGetSize2d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size_2d(handle, nx, ny, type_, workSize)
 }
 
 #[no_mangle]
@@ -346,7 +350,7 @@ pub unsafe extern "system" fn cufftGetSize3d(
     type_: cufftType,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size_3d(handle, nx, ny, nz, type_, workSize)
 }
 
 #[no_mangle]
@@ -364,7 +368,7 @@ pub unsafe extern "system" fn cufftGetSizeMany(
     batch: ::std::os::raw::c_int,
     workArea: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size_many(handle, rank, n, inembed, istride, idist, onembed, ostride, odist, type_, batch, workArea)
 }
 
 #[no_mangle]
@@ -372,7 +376,7 @@ pub unsafe extern "system" fn cufftGetSize(
     handle: cufftHandle,
     workSize: *mut usize,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_size(handle, workSize)
 }
 
 #[no_mangle]
@@ -380,7 +384,7 @@ pub unsafe extern "system" fn cufftSetWorkArea(
     plan: cufftHandle,
     workArea: *mut ::std::os::raw::c_void,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::set_work_area(plan, workArea)
 }
 
 #[no_mangle]
@@ -388,7 +392,7 @@ pub unsafe extern "system" fn cufftSetAutoAllocation(
     plan: cufftHandle,
     autoAllocate: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::set_auto_allocation(plan, autoAllocate)
 }
 
 #[no_mangle]
@@ -435,7 +439,7 @@ pub unsafe extern "system" fn cufftExecD2Z(
     idata: *mut cufftDoubleReal,
     odata: *mut cufftDoubleComplex,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::exec_d2z(plan, idata, odata)
 }
 
 #[no_mangle]
@@ -444,7 +448,7 @@ pub unsafe extern "system" fn cufftExecZ2D(
     idata: *mut cufftDoubleComplex,
     odata: *mut cufftDoubleReal,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::exec_z2d(plan, idata, odata)
 }
 
 #[no_mangle]
@@ -462,7 +466,7 @@ pub unsafe extern "system" fn cufftDestroy(plan: cufftHandle) -> cufftResult {
 
 #[no_mangle]
 pub unsafe extern "system" fn cufftGetVersion(version: *mut ::std::os::raw::c_int) -> cufftResult {
-    crate::unsupported()
+    crate::get_version(version)
 }
 
 #[no_mangle]
@@ -470,5 +474,5 @@ pub unsafe extern "system" fn cufftGetProperty(
     type_: libraryPropertyType,
     value: *mut ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    crate::get_property(type_, value)
 }

@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 #[allow(warnings)]
 mod cudnn_types_v7;
 #[allow(warnings)]
@@ -44,6 +45,12 @@ fn unsupported() -> cudnnStatus_t {
 fn to_cudnn(status: miopen_sys::miopenStatus_t) -> cudnnStatus_t {
     match status {
         miopen_sys::miopenStatus_t::miopenStatusSuccess => cudnnStatus_t::CUDNN_STATUS_SUCCESS,
+        miopenStatus_t::miopenStatusNotInitialized => cudnnStatus_t::CUDNN_STATUS_NOT_INITIALIZED,
+        miopenStatus_t::miopenStatusInvalidValue => cudnnStatus_t::CUDNN_STATUS_INVALID_VALUE,
+        miopenStatus_t::miopenStatusBadParm => cudnnStatus_t::CUDNN_STATUS_BAD_PARAM,
+        miopenStatus_t::miopenStatusAllocFailed => cudnnStatus_t::CUDNN_STATUS_ALLOC_FAILED,
+        miopenStatus_t::miopenStatusInternalError => cudnnStatus_t::CUDNN_STATUS_INTERNAL_ERROR,
+        miopenStatus_t::miopenStatusVersionMismatch => cudnnStatus_t::CUDNN_STATUS_VERSION_MISMATCH,
         err => panic!("{}", err.0), //cudnnStatus_t::CUDNN_STATUS_INTERNAL_ERROR,
     }
 }
@@ -111,6 +118,67 @@ fn from_data_type(type_: cudnnDataType_t) -> miopenDataType_t {
         cudnnDataType_t::CUDNN_DATA_FLOAT => miopenDataType_t::miopenFloat,
         cudnnDataType_t::CUDNN_DATA_DOUBLE => miopenDataType_t::miopenDouble,
         cudnnDataType_t::CUDNN_DATA_HALF => miopenDataType_t::miopenHalf,
+        cudnnDataType_t::CUDNN_DATA_INT32 => miopenDataType_t::miopenInt32,
+        cudnnDataType_t::CUDNN_DATA_INT8 => miopenDataType_t::miopenInt8,
+        cudnnDataType_t::CUDNN_DATA_INT8x4 => miopenDataType_t::miopenInt8x4,
+        cudnnDataType_t::CUDNN_DATA_BFLOAT16 => miopenDataType_t::miopenBFloat16,
+        _ => todo!(),
+    }
+}
+
+fn miopen_datatype_to_cudnn(type_: miopenDataType_t) -> cudnnDataType_t {
+    match type_ {
+        miopenDataType_t::miopenFloat => cudnnDataType_t::CUDNN_DATA_FLOAT,
+        miopenDataType_t::miopenDouble => cudnnDataType_t::CUDNN_DATA_DOUBLE,
+        miopenDataType_t::miopenHalf => cudnnDataType_t::CUDNN_DATA_HALF,
+        miopenDataType_t::miopenInt32 => cudnnDataType_t::CUDNN_DATA_INT32,
+        miopenDataType_t::miopenInt8 => cudnnDataType_t::CUDNN_DATA_INT8,
+        miopenDataType_t::miopenInt8x4 => cudnnDataType_t::CUDNN_DATA_INT8x4,
+        miopenDataType_t::miopenBFloat16 => cudnnDataType_t::CUDNN_DATA_BFLOAT16,
+        _ => todo!(),
+    }
+}
+
+fn to_batch_mode(mode: cudnnBatchNormMode_t) -> miopenBatchNormMode_t {
+    match mode {
+        cudnnBatchNormMode_t::CUDNN_BATCHNORM_PER_ACTIVATION => {
+            miopenBatchNormMode_t::miopenBNPerActivation
+        }
+        cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL => miopenBatchNormMode_t::miopenBNSpatial,
+        cudnnBatchNormMode_t::CUDNN_BATCHNORM_SPATIAL_PERSISTENT => {
+            miopenBatchNormMode_t::miopenBNSpatial
+        }
+        _ => todo!(),
+    }
+}
+
+fn to_pooling_mode(mode: cudnnPoolingMode_t) -> miopenPoolingMode_t {
+    match mode {
+        cudnnPoolingMode_t::CUDNN_POOLING_MAX_DETERMINISTIC => {
+            miopenPoolingMode_t::miopenPoolingMax
+        }
+        cudnnPoolingMode_t::CUDNN_POOLING_MAX => miopenPoolingMode_t::miopenPoolingMax,
+        cudnnPoolingMode_t::CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING => {
+            miopenPoolingMode_t::miopenPoolingAverageInclusive
+        }
+        cudnnPoolingMode_t::CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING => {
+            miopenPoolingMode_t::miopenPoolingAverage
+        }
+        _ => todo!(),
+    }
+}
+
+fn miopen_to_pooling_mode(mode: miopenPoolingMode_t) -> cudnnPoolingMode_t {
+    match mode {
+        miopenPoolingMode_t::miopenPoolingMax => {
+            cudnnPoolingMode_t::CUDNN_POOLING_MAX_DETERMINISTIC
+        }
+        miopenPoolingMode_t::miopenPoolingAverageInclusive => {
+            cudnnPoolingMode_t::CUDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING
+        }
+        miopenPoolingMode_t::miopenPoolingAverage => {
+            cudnnPoolingMode_t::CUDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING
+        }
         _ => todo!(),
     }
 }
@@ -1098,4 +1166,1110 @@ unsafe fn convolution_backward_data(
         work_space,
         work_space_size_in_bytes,
     ))
+}
+
+unsafe fn get_convolution_backward_filter_algorithm(
+    handle: cudnnHandle_t,
+    xDesc: cudnnTensorDescriptor_t,
+    dyDesc: cudnnTensorDescriptor_t,
+    convDesc: cudnnConvolutionDescriptor_t,
+    dwDesc: cudnnFilterDescriptor_t,
+    preference: cudnnConvolutionBwdFilterPreference_t,
+    memoryLimitInBytes: usize,
+    algo: *mut cudnnConvolutionBwdFilterAlgo_t,
+) -> cudnnStatus_t {
+    // ! To Do: hipdnnGetConvolutionBackwardFilterAlgorithm() in hipDNN impl
+    crate::unsupported()
+}
+
+unsafe fn get_stream(handle: cudnnHandle_t, streamId: *mut cudaStream_t) -> cudnnStatus_t {
+    to_cudnn(miopenGetStream(handle.cast(), streamId.cast()))
+}
+
+unsafe fn set_tensor4d_descriptor(
+    tensorDesc: cudnnTensorDescriptor_t,
+    format: cudnnTensorFormat_t,
+    dataType: cudnnDataType_t,
+    n: ::std::os::raw::c_int,
+    c: ::std::os::raw::c_int,
+    h: ::std::os::raw::c_int,
+    w: ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    let data_type = from_data_type(dataType);
+    to_cudnn(miopenSet4dTensorDescriptor(
+        tensorDesc.cast(),
+        data_type,
+        n,
+        c,
+        h,
+        w,
+    ))
+}
+
+unsafe fn get_tensor4d_descriptor(
+    tensorDesc: cudnnTensorDescriptor_t,
+    dataType: *mut cudnnDataType_t,
+    n: *mut ::std::os::raw::c_int,
+    c: *mut ::std::os::raw::c_int,
+    h: *mut ::std::os::raw::c_int,
+    w: *mut ::std::os::raw::c_int,
+    nStride: *mut ::std::os::raw::c_int,
+    cStride: *mut ::std::os::raw::c_int,
+    hStride: *mut ::std::os::raw::c_int,
+    wStride: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    let mut data_type: miopenDataType_t = miopenDataType_t::miopenFloat;
+    let status = miopenGet4dTensorDescriptor(
+        tensorDesc.cast(),
+        &mut data_type,
+        n,
+        c,
+        h,
+        w,
+        nStride,
+        cStride,
+        hStride,
+        wStride,
+    );
+    *dataType = miopen_datatype_to_cudnn(data_type);
+    to_cudnn(status)
+}
+
+unsafe fn get_tensor_nd_descriptor(
+    tensorDesc: cudnnTensorDescriptor_t,
+    nbDimsRequested: ::std::os::raw::c_int,
+    dataType: *mut cudnnDataType_t,
+    nbDims: *mut ::std::os::raw::c_int,
+    dimA: *mut ::std::os::raw::c_int,
+    strideA: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    /*
+     * !To Do: hipdnnGetTensorNdDescriptor
+     */
+    crate::unsupported()
+}
+
+unsafe fn create_op_tensor_descriptor(
+    opTensorDesc: *mut cudnnOpTensorDescriptor_t,
+) -> cudnnStatus_t {
+    /*
+     * !To Do: hipdnnCreateOpTensorDescriptor
+     */
+    crate::unsupported()
+}
+
+unsafe fn set_op_tensor_descriptor(
+    opTensorDesc: cudnnOpTensorDescriptor_t,
+    opTensorOp: cudnnOpTensorOp_t,
+    opTensorCompType: cudnnDataType_t,
+    opTensorNanOpt: cudnnNanPropagation_t,
+) -> cudnnStatus_t {
+    /*
+     * !To Do: hipdnnSetOpTensorDescriptor
+     */
+    crate::unsupported()
+}
+
+unsafe fn get_op_tensor_descriptor(
+    opTensorDesc: cudnnOpTensorDescriptor_t,
+    opTensorOp: *mut cudnnOpTensorOp_t,
+    opTensorCompType: *mut cudnnDataType_t,
+    opTensorNanOpt: *mut cudnnNanPropagation_t,
+) -> cudnnStatus_t {
+    /*
+     * !To Do: hipdnnGetOpTensorDescriptor
+     */
+    crate::unsupported()
+}
+
+unsafe fn destroy_op_tensor_descriptor(opTensorDesc: cudnnOpTensorDescriptor_t) -> cudnnStatus_t {
+    /*
+     * !To Do: hipdnnDestroyOpTensorDescriptor
+     */
+    crate::unsupported()
+}
+
+unsafe fn convolution_bias_activation_forward(
+    handle: cudnnHandle_t,
+    alpha1: *const ::std::os::raw::c_void,
+    xDesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    wDesc: cudnnFilterDescriptor_t,
+    w: *const ::std::os::raw::c_void,
+    convDesc: cudnnConvolutionDescriptor_t,
+    algo: cudnnConvolutionFwdAlgo_t,
+    workSpace: *mut ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+    alpha2: *const ::std::os::raw::c_void,
+    zDesc: cudnnTensorDescriptor_t,
+    z: *const ::std::os::raw::c_void,
+    biasDesc: cudnnTensorDescriptor_t,
+    bias: *const ::std::os::raw::c_void,
+    activationDesc: cudnnActivationDescriptor_t,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    let fwd_algo = algo_from_cudnn(algo);
+    crate::to_cudnn(miopenConvolutionBiasActivationForward(
+        handle.cast(),
+        alpha1,
+        xDesc.cast(),
+        x,
+        wDesc.cast(),
+        w,
+        convDesc.cast(),
+        fwd_algo,
+        workSpace,
+        workSpaceSizeInBytes,
+        alpha2,
+        zDesc.cast(),
+        z,
+        biasDesc.cast(),
+        bias,
+        activationDesc.cast(),
+        yDesc.cast(),
+        y,
+    ))
+}
+
+unsafe fn get_convolution2d_forward_output_dim(
+    convDesc: cudnnConvolutionDescriptor_t,
+    inputTensorDesc: cudnnTensorDescriptor_t,
+    filterDesc: cudnnFilterDescriptor_t,
+    n: *mut ::std::os::raw::c_int,
+    c: *mut ::std::os::raw::c_int,
+    h: *mut ::std::os::raw::c_int,
+    w: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetConvolutionForwardOutputDim(
+        convDesc.cast(),
+        inputTensorDesc.cast(),
+        filterDesc.cast(),
+        n,
+        c,
+        h,
+        w,
+    ))
+}
+
+unsafe fn get_ctc_loss_workspace_size(
+    handle: cudnnHandle_t,
+    probsDesc: cudnnTensorDescriptor_t,
+    gradientsDesc: cudnnTensorDescriptor_t,
+    labels: *const ::std::os::raw::c_int,
+    labelLengths: *const ::std::os::raw::c_int,
+    inputLengths: *const ::std::os::raw::c_int,
+    algo: cudnnCTCLossAlgo_t,
+    ctcLossDesc: cudnnCTCLossDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetCTCLossWorkspaceSize(
+        handle.cast(),
+        probsDesc.cast(),
+        gradientsDesc.cast(),
+        labels,
+        labelLengths,
+        inputLengths,
+        miopenCTCLossAlgo_t::MIOPEN_CTC_LOSS_ALGO_DETERMINISTIC,
+        ctcLossDesc.cast(),
+        sizeInBytes,
+    ))
+}
+
+unsafe fn ctc_loss(
+    handle: cudnnHandle_t,
+    probsDesc: cudnnTensorDescriptor_t,
+    probs: *const ::std::os::raw::c_void,
+    hostLabels: *const ::std::os::raw::c_int,
+    hostLabelLengths: *const ::std::os::raw::c_int,
+    hostInputLengths: *const ::std::os::raw::c_int,
+    costs: *mut ::std::os::raw::c_void,
+    gradientsDesc: cudnnTensorDescriptor_t,
+    gradients: *mut ::std::os::raw::c_void,
+    algo: cudnnCTCLossAlgo_t,
+    ctcLossDesc: cudnnCTCLossDescriptor_t,
+    workspace: *mut ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenCTCLoss(
+        handle.cast(),
+        probsDesc.cast(),
+        probs,
+        hostLabels,
+        hostLabelLengths,
+        hostInputLengths,
+        costs,
+        gradientsDesc.cast(),
+        gradients,
+        miopenCTCLossAlgo_t::MIOPEN_CTC_LOSS_ALGO_DETERMINISTIC,
+        ctcLossDesc.cast(),
+        workspace,
+        workSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn destroy_ctc_loss_descriptor(ctcLossDesc: cudnnCTCLossDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenDestroyCTCLossDescriptor(ctcLossDesc.cast()))
+}
+
+unsafe fn get_ctc_loss_descriptor(
+    ctcLossDesc: cudnnCTCLossDescriptor_t,
+    compType: *mut cudnnDataType_t,
+) -> cudnnStatus_t {
+    let mut data_type: miopenDataType_t = miopenDataType_t::miopenFloat;
+    let mut blank_label_id: i32 = 0;
+    let mut apply_softmax_layer: bool = false;
+    let status = miopenGetCTCLossDescriptor(
+        ctcLossDesc.cast(),
+        &mut data_type,
+        &mut blank_label_id,
+        &mut apply_softmax_layer,
+    );
+    *compType = miopen_datatype_to_cudnn(data_type);
+    to_cudnn(status)
+}
+
+unsafe fn set_ctc_loss_descriptor(
+    ctcLossDesc: cudnnCTCLossDescriptor_t,
+    compType: cudnnDataType_t,
+) -> cudnnStatus_t {
+    let data_type = from_data_type(compType);
+    let blank_label_id: i32 = 0;
+    let apply_softmax_layer: bool = false;
+    to_cudnn(miopenSetCTCLossDescriptor(
+        ctcLossDesc.cast(),
+        data_type,
+        blank_label_id,
+        apply_softmax_layer,
+    ))
+}
+
+unsafe fn create_ctc_loss_descriptor(ctcLossDesc: *mut cudnnCTCLossDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenCreateCTCLossDescriptor(ctcLossDesc.cast()))
+}
+
+unsafe fn rnn_backward_weights(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    xDesc: *const cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    hxDesc: cudnnTensorDescriptor_t,
+    hx: *const ::std::os::raw::c_void,
+    yDesc: *const cudnnTensorDescriptor_t,
+    y: *const ::std::os::raw::c_void,
+    workSpace: *const ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+    dwDesc: cudnnFilterDescriptor_t,
+    dw: *mut ::std::os::raw::c_void,
+    reserveSpace: *const ::std::os::raw::c_void,
+    reserveSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenRNNBackwardWeights(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        xDesc.cast(),
+        x,
+        hxDesc.cast(),
+        hx,
+        yDesc.cast(),
+        y,
+        dwDesc.cast(),
+        dw,
+        workSpace as _,
+        workSpaceSizeInBytes,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    ))
+}
+
+pub unsafe extern "system" fn rnn_backward_data(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    yDesc: *const cudnnTensorDescriptor_t,
+    y: *const ::std::os::raw::c_void,
+    dyDesc: *const cudnnTensorDescriptor_t,
+    dy: *const ::std::os::raw::c_void,
+    dhyDesc: cudnnTensorDescriptor_t,
+    dhy: *const ::std::os::raw::c_void,
+    dcyDesc: cudnnTensorDescriptor_t,
+    dcy: *const ::std::os::raw::c_void,
+    wDesc: cudnnFilterDescriptor_t,
+    w: *const ::std::os::raw::c_void,
+    hxDesc: cudnnTensorDescriptor_t,
+    hx: *const ::std::os::raw::c_void,
+    cxDesc: cudnnTensorDescriptor_t,
+    cx: *const ::std::os::raw::c_void,
+    dxDesc: *const cudnnTensorDescriptor_t,
+    dx: *mut ::std::os::raw::c_void,
+    dhxDesc: cudnnTensorDescriptor_t,
+    dhx: *mut ::std::os::raw::c_void,
+    dcxDesc: cudnnTensorDescriptor_t,
+    dcx: *mut ::std::os::raw::c_void,
+    workSpace: *mut ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+    reserveSpace: *mut ::std::os::raw::c_void,
+    reserveSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenRNNBackwardData(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        yDesc.cast(),
+        y,
+        dyDesc.cast(),
+        dy,
+        dhyDesc.cast(),
+        dhy,
+        dcyDesc.cast(),
+        dcy,
+        wDesc.cast(),
+        w,
+        hxDesc.cast(),
+        hx,
+        cxDesc.cast(),
+        cx,
+        dxDesc.cast(),
+        dx,
+        dhxDesc.cast(),
+        dhx,
+        dcxDesc.cast(),
+        dcx,
+        workSpace,
+        workSpaceSizeInBytes,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn rnn_forward_training(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    xDesc: *const cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    hxDesc: cudnnTensorDescriptor_t,
+    hx: *const ::std::os::raw::c_void,
+    cxDesc: cudnnTensorDescriptor_t,
+    cx: *const ::std::os::raw::c_void,
+    wDesc: cudnnFilterDescriptor_t,
+    w: *const ::std::os::raw::c_void,
+    yDesc: *const cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    hyDesc: cudnnTensorDescriptor_t,
+    hy: *mut ::std::os::raw::c_void,
+    cyDesc: cudnnTensorDescriptor_t,
+    cy: *mut ::std::os::raw::c_void,
+    workSpace: *mut ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+    reserveSpace: *mut ::std::os::raw::c_void,
+    reserveSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenRNNForwardTraining(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        xDesc.cast(),
+        x,
+        hxDesc.cast(),
+        hx,
+        cxDesc.cast(),
+        cx,
+        wDesc.cast(),
+        w,
+        yDesc.cast(),
+        y,
+        hyDesc.cast(),
+        hy,
+        cyDesc.cast(),
+        cy,
+        workSpace,
+        workSpaceSizeInBytes,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn rnn_forward_inference(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    xDesc: *const cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    hxDesc: cudnnTensorDescriptor_t,
+    hx: *const ::std::os::raw::c_void,
+    cxDesc: cudnnTensorDescriptor_t,
+    cx: *const ::std::os::raw::c_void,
+    wDesc: cudnnFilterDescriptor_t,
+    w: *const ::std::os::raw::c_void,
+    yDesc: *const cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    hyDesc: cudnnTensorDescriptor_t,
+    hy: *mut ::std::os::raw::c_void,
+    cyDesc: cudnnTensorDescriptor_t,
+    cy: *mut ::std::os::raw::c_void,
+    workSpace: *mut ::std::os::raw::c_void,
+    workSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenRNNForwardInference(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        xDesc.cast(),
+        x,
+        hxDesc.cast(),
+        hx,
+        cxDesc.cast(),
+        cx,
+        wDesc.cast(),
+        w,
+        yDesc.cast(),
+        y,
+        hyDesc.cast(),
+        hy,
+        cyDesc.cast(),
+        cy,
+        workSpace,
+        workSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn get_rnn_params_size(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    xDesc: cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+    dataType: cudnnDataType_t,
+) -> cudnnStatus_t {
+    let data_type = from_data_type(dataType);
+    to_cudnn(miopenGetRNNParamsSize(
+        handle.cast(),
+        rnnDesc.cast(),
+        xDesc.cast(),
+        sizeInBytes,
+        data_type,
+    ))
+}
+
+unsafe fn get_rnn_training_reserve_size(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    xDesc: *const cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetRNNTrainingReserveSize(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        xDesc.cast(),
+        sizeInBytes,
+    ))
+}
+
+unsafe fn get_rnn_workspace_size(
+    handle: cudnnHandle_t,
+    rnnDesc: cudnnRNNDescriptor_t,
+    seqLength: ::std::os::raw::c_int,
+    xDesc: *const cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetRNNWorkspaceSize(
+        handle.cast(),
+        rnnDesc.cast(),
+        seqLength,
+        xDesc.cast(),
+        sizeInBytes,
+    ))
+}
+
+unsafe fn destroy_rnn_descriptor(rnnDesc: cudnnRNNDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenDestroyRNNDescriptor(rnnDesc.cast()))
+}
+
+unsafe fn create_rnn_descriptor(rnnDesc: *mut cudnnRNNDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenCreateRNNDescriptor(rnnDesc.cast()))
+}
+
+unsafe fn dropout_backward(
+    handle: cudnnHandle_t,
+    dropoutDesc: cudnnDropoutDescriptor_t,
+    dydesc: cudnnTensorDescriptor_t,
+    dy: *const ::std::os::raw::c_void,
+    dxdesc: cudnnTensorDescriptor_t,
+    dx: *mut ::std::os::raw::c_void,
+    reserveSpace: *mut ::std::os::raw::c_void,
+    reserveSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenDropoutBackward(
+        handle.cast(),
+        dropoutDesc.cast(),
+        ptr::null_mut(),
+        dydesc.cast(),
+        dy,
+        dxdesc.cast(),
+        dx,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn batch_normalization_backward(
+    handle: cudnnHandle_t,
+    mode: cudnnBatchNormMode_t,
+    alphaDataDiff: *const ::std::os::raw::c_void,
+    betaDataDiff: *const ::std::os::raw::c_void,
+    alphaParamDiff: *const ::std::os::raw::c_void,
+    betaParamDiff: *const ::std::os::raw::c_void,
+    xDesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    dyDesc: cudnnTensorDescriptor_t,
+    dy: *const ::std::os::raw::c_void,
+    dxDesc: cudnnTensorDescriptor_t,
+    dx: *mut ::std::os::raw::c_void,
+    dBnScaleBiasDesc: cudnnTensorDescriptor_t,
+    bnScale: *const ::std::os::raw::c_void,
+    dBnScaleResult: *mut ::std::os::raw::c_void,
+    dBnBiasResult: *mut ::std::os::raw::c_void,
+    epsilon: f64,
+    savedMean: *const ::std::os::raw::c_void,
+    savedInvVariance: *const ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    let bat_mode = to_batch_mode(mode);
+    to_cudnn(miopenBatchNormalizationBackward(
+        handle.cast(),
+        bat_mode,
+        alphaDataDiff,
+        betaDataDiff,
+        alphaParamDiff,
+        betaParamDiff,
+        xDesc.cast(),
+        x,
+        dyDesc.cast(),
+        dy,
+        dxDesc.cast(),
+        dx,
+        dBnScaleBiasDesc.cast(),
+        bnScale,
+        dBnScaleResult,
+        dBnBiasResult,
+        epsilon,
+        savedMean,
+        savedInvVariance,
+    ))
+}
+
+unsafe fn batch_normalization_forward_training(
+    handle: cudnnHandle_t,
+    mode: cudnnBatchNormMode_t,
+    alpha: *const ::std::os::raw::c_void,
+    beta: *const ::std::os::raw::c_void,
+    xDesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    bnScaleBiasMeanVarDesc: cudnnTensorDescriptor_t,
+    bnScale: *const ::std::os::raw::c_void,
+    bnBias: *const ::std::os::raw::c_void,
+    exponentialAverageFactor: f64,
+    resultRunningMean: *mut ::std::os::raw::c_void,
+    resultRunningVariance: *mut ::std::os::raw::c_void,
+    epsilon: f64,
+    resultSaveMean: *mut ::std::os::raw::c_void,
+    resultSaveInvVariance: *mut ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    let bat_mode = to_batch_mode(mode);
+    to_cudnn(miopenBatchNormalizationForwardTraining(
+        handle.cast(),
+        bat_mode,
+        alpha as _,
+        beta as _,
+        xDesc.cast(),
+        x,
+        yDesc.cast(),
+        y,
+        bnScaleBiasMeanVarDesc.cast(),
+        bnScale as _,
+        bnBias as _,
+        exponentialAverageFactor,
+        resultRunningMean,
+        resultRunningVariance,
+        epsilon,
+        resultSaveMean,
+        resultSaveInvVariance,
+    ))
+}
+
+unsafe fn activation_backward(
+    handle: cudnnHandle_t,
+    activationDesc: cudnnActivationDescriptor_t,
+    alpha: *const ::std::os::raw::c_void,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *const ::std::os::raw::c_void,
+    dyDesc: cudnnTensorDescriptor_t,
+    dy: *const ::std::os::raw::c_void,
+    xDesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    beta: *const ::std::os::raw::c_void,
+    dxDesc: cudnnTensorDescriptor_t,
+    dx: *mut ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    to_cudnn(miopenActivationBackward(
+        handle.cast(),
+        activationDesc.cast(),
+        alpha,
+        yDesc.cast(),
+        y,
+        dyDesc.cast(),
+        dy,
+        xDesc.cast(),
+        x,
+        beta,
+        dxDesc.cast(),
+        dx,
+    ))
+}
+
+unsafe fn softmax_backward(
+    handle: cudnnHandle_t,
+    algo: cudnnSoftmaxAlgorithm_t,
+    mode: cudnnSoftmaxMode_t,
+    alpha: *const ::std::os::raw::c_void,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *const ::std::os::raw::c_void,
+    dyDesc: cudnnTensorDescriptor_t,
+    dy: *const ::std::os::raw::c_void,
+    beta: *const ::std::os::raw::c_void,
+    dxDesc: cudnnTensorDescriptor_t,
+    dx: *mut ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    to_cudnn(miopenSoftmaxBackward(
+        handle.cast(),
+        alpha,
+        yDesc.cast(),
+        y,
+        dyDesc.cast(),
+        dy,
+        beta,
+        dxDesc.cast(),
+        dx,
+    ))
+}
+
+unsafe fn dropout_forward(
+    handle: cudnnHandle_t,
+    dropoutDesc: cudnnDropoutDescriptor_t,
+    xdesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    ydesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    reserveSpace: *mut ::std::os::raw::c_void,
+    reserveSpaceSizeInBytes: usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenDropoutForward(
+        handle.cast(),
+        dropoutDesc.cast(),
+        ptr::null_mut(),
+        xdesc.cast(),
+        x,
+        ydesc.cast(),
+        y,
+        reserveSpace,
+        reserveSpaceSizeInBytes,
+    ))
+}
+
+unsafe fn get_dropout_descriptor(
+    dropoutDesc: cudnnDropoutDescriptor_t,
+    handle: cudnnHandle_t,
+    dropout: *mut f32,
+    states: *mut *mut ::std::os::raw::c_void,
+    seed: *mut ::std::os::raw::c_ulonglong,
+) -> cudnnStatus_t {
+    let mut use_mask = false;
+    let mut state_evo = false;
+    let mut rng_mode = miopenRNGType_t::MIOPEN_RNG_PSEUDO_XORWOW;
+    to_cudnn(miopenGetDropoutDescriptor(
+        dropoutDesc.cast(),
+        handle.cast(),
+        dropout,
+        states,
+        seed,
+        &mut use_mask,
+        &mut state_evo,
+        &mut rng_mode,
+    ))
+}
+
+unsafe fn restore_dropout_descriptor(
+    dropoutDesc: cudnnDropoutDescriptor_t,
+    handle: cudnnHandle_t,
+    dropout: f32,
+    states: *mut ::std::os::raw::c_void,
+    stateSizeInBytes: usize,
+    seed: ::std::os::raw::c_ulonglong,
+) -> cudnnStatus_t {
+    let use_mask = false;
+    let state_evo = false;
+    let rng_mode = miopenRNGType_t::MIOPEN_RNG_PSEUDO_XORWOW;
+    to_cudnn(miopenRestoreDropoutDescriptor(
+        dropoutDesc.cast(),
+        handle.cast(),
+        dropout,
+        states,
+        stateSizeInBytes,
+        seed,
+        use_mask,
+        state_evo,
+        rng_mode,
+    ))
+}
+
+unsafe fn set_dropout_descriptor(
+    dropoutDesc: cudnnDropoutDescriptor_t,
+    handle: cudnnHandle_t,
+    dropout: f32,
+    states: *mut ::std::os::raw::c_void,
+    stateSizeInBytes: usize,
+    seed: ::std::os::raw::c_ulonglong,
+) -> cudnnStatus_t {
+    let use_mask = false;
+    let state_evo = false;
+    let rng_mode = miopenRNGType_t::MIOPEN_RNG_PSEUDO_XORWOW;
+    to_cudnn(miopenSetDropoutDescriptor(
+        dropoutDesc.cast(),
+        handle.cast(),
+        dropout,
+        states,
+        stateSizeInBytes,
+        seed,
+        use_mask,
+        state_evo,
+        rng_mode,
+    ))
+}
+
+unsafe fn dropout_get_reserve_space_size(
+    xdesc: cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenDropoutGetReserveSpaceSize(xdesc.cast(), sizeInBytes))
+}
+
+unsafe fn dropout_get_states_size(handle: cudnnHandle_t, sizeInBytes: *mut usize) -> cudnnStatus_t {
+    to_cudnn(miopenDropoutGetStatesSize(handle.cast(), sizeInBytes))
+}
+
+unsafe fn create_dropout_descriptor(dropoutDesc: *mut cudnnDropoutDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenCreateDropoutDescriptor(dropoutDesc.cast()))
+}
+
+unsafe fn destroy_dropout_descriptor(dropoutDesc: cudnnDropoutDescriptor_t) -> cudnnStatus_t {
+    to_cudnn(miopenDestroyDropoutDescriptor(dropoutDesc.cast()))
+}
+
+unsafe fn batch_normalization_forward_inference(
+    handle: cudnnHandle_t,
+    mode: cudnnBatchNormMode_t,
+    alpha: *const ::std::os::raw::c_void,
+    beta: *const ::std::os::raw::c_void,
+    xDesc: cudnnTensorDescriptor_t,
+    x: *const ::std::os::raw::c_void,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    bnScaleBiasMeanVarDesc: cudnnTensorDescriptor_t,
+    bnScale: *const ::std::os::raw::c_void,
+    bnBias: *const ::std::os::raw::c_void,
+    estimatedMean: *const ::std::os::raw::c_void,
+    estimatedVariance: *const ::std::os::raw::c_void,
+    epsilon: f64,
+) -> cudnnStatus_t {
+    let bat_mode = to_batch_mode(mode);
+    to_cudnn(miopenBatchNormalizationForwardInference(
+        handle.cast(),
+        bat_mode,
+        alpha as _,
+        beta as _,
+        xDesc.cast(),
+        x,
+        yDesc.cast(),
+        y,
+        bnScaleBiasMeanVarDesc.cast(),
+        bnScale as _,
+        bnBias as _,
+        estimatedMean as _,
+        estimatedVariance as _,
+        epsilon,
+    ))
+}
+
+unsafe fn derive_bn_tensor_descriptor(
+    derivedBnDesc: cudnnTensorDescriptor_t,
+    xDesc: cudnnTensorDescriptor_t,
+    mode: cudnnBatchNormMode_t,
+) -> cudnnStatus_t {
+    let batch_mode = to_batch_mode(mode);
+    to_cudnn(miopenDeriveBNTensorDescriptor(
+        derivedBnDesc.cast(),
+        xDesc.cast(),
+        batch_mode,
+    ))
+}
+
+unsafe fn get_lrn_descriptor(
+    normDesc: cudnnLRNDescriptor_t,
+    lrnN: *mut ::std::os::raw::c_uint,
+    lrnAlpha: *mut f64,
+    lrnBeta: *mut f64,
+    lrnK: *mut f64,
+) -> cudnnStatus_t {
+    let mut mode = miopenLRNMode_t::miopenLRNCrossChannel;
+    to_cudnn(miopenGetLRNDescriptor(
+        normDesc.cast(),
+        &mut mode,
+        lrnN,
+        lrnAlpha,
+        lrnBeta,
+        lrnK,
+    ))
+}
+
+unsafe fn get_pooling2d_forward_output_dim(
+    poolingDesc: cudnnPoolingDescriptor_t,
+    inputTensorDesc: cudnnTensorDescriptor_t,
+    n: *mut ::std::os::raw::c_int,
+    c: *mut ::std::os::raw::c_int,
+    h: *mut ::std::os::raw::c_int,
+    w: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetPoolingForwardOutputDim(
+        poolingDesc.cast(),
+        inputTensorDesc.cast(),
+        n,
+        c,
+        h,
+        w,
+    ))
+}
+
+unsafe fn get_pooling_nd_descriptor(
+    poolingDesc: cudnnPoolingDescriptor_t,
+    nbDimsRequested: ::std::os::raw::c_int,
+    mode: *mut cudnnPoolingMode_t,
+    maxpoolingNanOpt: *mut cudnnNanPropagation_t,
+    nbDims: *mut ::std::os::raw::c_int,
+    windowDimA: *mut ::std::os::raw::c_int,
+    paddingA: *mut ::std::os::raw::c_int,
+    strideA: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    let mut pool_mode = miopenPoolingMode_t::miopenPoolingAverage;
+    let status = miopenGetNdPoolingDescriptor(
+        poolingDesc.cast(),
+        nbDimsRequested,
+        &mut pool_mode,
+        nbDims,
+        windowDimA,
+        paddingA,
+        strideA,
+    );
+    *mode = miopen_to_pooling_mode(pool_mode);
+    *maxpoolingNanOpt = cudnnNanPropagation_t::CUDNN_PROPAGATE_NAN;
+    to_cudnn(status)
+}
+
+unsafe fn get_pooling_2d_descriptor(
+    poolingDesc: cudnnPoolingDescriptor_t,
+    mode: *mut cudnnPoolingMode_t,
+    maxpoolingNanOpt: *mut cudnnNanPropagation_t,
+    windowHeight: *mut ::std::os::raw::c_int,
+    windowWidth: *mut ::std::os::raw::c_int,
+    verticalPadding: *mut ::std::os::raw::c_int,
+    horizontalPadding: *mut ::std::os::raw::c_int,
+    verticalStride: *mut ::std::os::raw::c_int,
+    horizontalStride: *mut ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    let mut pool_mode = miopenPoolingMode_t::miopenPoolingAverage;
+    let status = miopenGet2dPoolingDescriptor(
+        poolingDesc.cast(),
+        &mut pool_mode,
+        windowHeight,
+        windowWidth,
+        verticalPadding,
+        horizontalPadding,
+        verticalStride,
+        horizontalStride,
+    );
+    *mode = miopen_to_pooling_mode(pool_mode);
+    *maxpoolingNanOpt = cudnnNanPropagation_t::CUDNN_PROPAGATE_NAN;
+    to_cudnn(status)
+}
+
+unsafe fn set_pooling_2d_descriptor(
+    poolingDesc: cudnnPoolingDescriptor_t,
+    mode: cudnnPoolingMode_t,
+    maxpoolingNanOpt: cudnnNanPropagation_t,
+    windowHeight: ::std::os::raw::c_int,
+    windowWidth: ::std::os::raw::c_int,
+    verticalPadding: ::std::os::raw::c_int,
+    horizontalPadding: ::std::os::raw::c_int,
+    verticalStride: ::std::os::raw::c_int,
+    horizontalStride: ::std::os::raw::c_int,
+) -> cudnnStatus_t {
+    let pool_mode = to_pooling_mode(mode);
+    to_cudnn(miopenSet2dPoolingDescriptor(
+        poolingDesc.cast(),
+        pool_mode,
+        windowHeight,
+        windowWidth,
+        verticalPadding,
+        horizontalPadding,
+        verticalStride,
+        horizontalStride,
+    ))
+}
+
+unsafe fn scale_tensor(
+    handle: cudnnHandle_t,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    alpha: *const ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    to_cudnn(miopenScaleTensor(handle.cast(), yDesc.cast(), y, alpha))
+}
+
+unsafe fn set_tensor(
+    handle: cudnnHandle_t,
+    yDesc: cudnnTensorDescriptor_t,
+    y: *mut ::std::os::raw::c_void,
+    valuePtr: *const ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    to_cudnn(miopenSetTensor(handle.cast(), yDesc.cast(), y, valuePtr))
+}
+
+unsafe fn reduce_tensor(
+    handle: cudnnHandle_t,
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+    indices: *mut ::std::os::raw::c_void,
+    indicesSizeInBytes: usize,
+    workspace: *mut ::std::os::raw::c_void,
+    workspaceSizeInBytes: usize,
+    alpha: *const ::std::os::raw::c_void,
+    aDesc: cudnnTensorDescriptor_t,
+    A: *const ::std::os::raw::c_void,
+    beta: *const ::std::os::raw::c_void,
+    cDesc: cudnnTensorDescriptor_t,
+    C: *mut ::std::os::raw::c_void,
+) -> cudnnStatus_t {
+    to_cudnn(miopenReduceTensor(
+        handle.cast(),
+        reduceTensorDesc.cast(),
+        indices,
+        indicesSizeInBytes,
+        workspace,
+        workspaceSizeInBytes,
+        alpha,
+        aDesc.cast(),
+        A,
+        beta,
+        cDesc.cast(),
+        C,
+    ))
+}
+
+unsafe fn get_reduction_workspace_size(
+    handle: cudnnHandle_t,
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+    aDesc: cudnnTensorDescriptor_t,
+    cDesc: cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetReductionWorkspaceSize(
+        handle.cast(),
+        reduceTensorDesc.cast(),
+        aDesc.cast(),
+        cDesc.cast(),
+        sizeInBytes,
+    ))
+}
+
+unsafe fn get_reduction_indices_size(
+    handle: cudnnHandle_t,
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+    aDesc: cudnnTensorDescriptor_t,
+    cDesc: cudnnTensorDescriptor_t,
+    sizeInBytes: *mut usize,
+) -> cudnnStatus_t {
+    to_cudnn(miopenGetReductionIndicesSize(
+        handle.cast(),
+        reduceTensorDesc.cast(),
+        aDesc.cast(),
+        cDesc.cast(),
+        sizeInBytes,
+    ))
+}
+
+unsafe fn destroy_reduce_tensor_descriptor(
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+) -> cudnnStatus_t {
+    to_cudnn(miopenDestroyReduceTensorDescriptor(reduceTensorDesc.cast()))
+}
+
+unsafe fn get_reduce_tensor_descriptor(
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+    reduceTensorOp: *mut cudnnReduceTensorOp_t,
+    reduceTensorCompType: *mut cudnnDataType_t,
+    reduceTensorNanOpt: *mut cudnnNanPropagation_t,
+    reduceTensorIndices: *mut cudnnReduceTensorIndices_t,
+    reduceTensorIndicesType: *mut cudnnIndicesType_t,
+) -> cudnnStatus_t {
+    let mut op = miopenReduceTensorOp_t::MIOPEN_REDUCE_TENSOR_ADD;
+    let mut type_ = miopenDataType_t::miopenFloat;
+    let mut nan_opt = miopenNanPropagation_t::MIOPEN_NOT_PROPAGATE_NAN;
+    let mut indices = miopenReduceTensorIndices_t::MIOPEN_REDUCE_TENSOR_NO_INDICES;
+    let mut indices_type = miopenIndicesType_t::MIOPEN_32BIT_INDICES;
+    let status = miopenGetReduceTensorDescriptor(
+        reduceTensorDesc.cast(),
+        &mut op,
+        &mut type_,
+        &mut nan_opt,
+        &mut indices,
+        &mut indices_type,
+    );
+    *reduceTensorOp = cudnnReduceTensorOp_t(op.0);
+    *reduceTensorCompType = miopen_datatype_to_cudnn(type_);
+    *reduceTensorNanOpt = cudnnNanPropagation_t(nan_opt.0);
+    *reduceTensorIndices = cudnnReduceTensorIndices_t(indices.0);
+    *reduceTensorIndicesType = cudnnIndicesType_t(indices_type.0);
+    to_cudnn(status)
+}
+
+pub unsafe extern "system" fn set_reduce_tensor_descriptor(
+    reduceTensorDesc: cudnnReduceTensorDescriptor_t,
+    reduceTensorOp: cudnnReduceTensorOp_t,
+    reduceTensorCompType: cudnnDataType_t,
+    reduceTensorNanOpt: cudnnNanPropagation_t,
+    reduceTensorIndices: cudnnReduceTensorIndices_t,
+    reduceTensorIndicesType: cudnnIndicesType_t,
+) -> cudnnStatus_t {
+    let op = miopenReduceTensorOp_t(reduceTensorOp.0);
+    let type_ = from_data_type(reduceTensorCompType);
+    let nan_opt = miopenNanPropagation_t(reduceTensorNanOpt.0);
+    let indices = miopenReduceTensorIndices_t(reduceTensorIndices.0);
+    let indices_type = miopenIndicesType_t(reduceTensorIndicesType.0);
+    to_cudnn(miopenSetReduceTensorDescriptor(
+        reduceTensorDesc.cast(),
+        op,
+        type_,
+        nan_opt,
+        indices,
+        indices_type,
+    ))
+}
+
+unsafe fn create_reduce_tensor_descriptor(
+    reduceTensorDesc: *mut cudnnReduceTensorDescriptor_t,
+) -> cudnnStatus_t {
+    to_cudnn(miopenCreateReduceTensorDescriptor(reduceTensorDesc.cast()))
 }

@@ -35,7 +35,16 @@ pub unsafe extern "system" fn cudnnGetConvolutionBackwardFilterAlgorithm(
     memoryLimitInBytes: usize,
     algo: *mut cudnnConvolutionBwdFilterAlgo_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    crate::get_convolution_backward_filter_algorithm(
+        handle,
+        xDesc,
+        dyDesc,
+        convDesc,
+        dwDesc,
+        preference,
+        memoryLimitInBytes,
+        algo,
+    )
 }
 
 #[no_mangle]
@@ -73,7 +82,13 @@ pub unsafe extern "system" fn cudnnSetRNNDescriptor(
     algo: cudnnRNNAlgo_t,
     mathPrec: cudnnDataType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    /**
+     * cuDNN 
+     *  5.0.0 Add
+     *  7.6.5 Deprecated
+     *  8.0.1 Removed
+     */ 
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -87,5 +102,11 @@ pub unsafe extern "system" fn cudnnSetRNNDescriptor_v5(
     mode: cudnnRNNMode_t,
     mathPrec: cudnnDataType_t,
 ) -> cudnnStatus_t {
-    crate::unsupported()
+    /**
+     * cuDNN
+     *  7.0.5 Add
+     *  7.6.5 Deprecated
+     *  8.0.1 Removed
+     */ 
+    cudnnStatus_t::CUDNN_STATUS_NOT_SUPPORTED
 }

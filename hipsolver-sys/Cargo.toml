@@ -1,0 +1,8 @@
+[package]
+name = "hipsolver-sys"
+version = "0.0.0"
+authors = ["dwwdyxiang@gmail.com"]
+edition = "2018"
+links = "hipsolver"
+
+[lib]
