@@ -3210,7 +3210,7 @@ pub unsafe extern "system" fn cusolverDnSorgqr_bufferSize(
     tau: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgqr_buffer_size(handle, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3224,7 +3224,7 @@ pub unsafe extern "system" fn cusolverDnDorgqr_bufferSize(
     tau: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgqr_buffer_size(handle, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3238,7 +3238,7 @@ pub unsafe extern "system" fn cusolverDnCungqr_bufferSize(
     tau: *const cuComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungqr_buffer_size(handle, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3252,7 +3252,7 @@ pub unsafe extern "system" fn cusolverDnZungqr_bufferSize(
     tau: *const cuDoubleComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungqr_buffer_size(handle, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3268,7 +3268,7 @@ pub unsafe extern "system" fn cusolverDnSorgqr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgqr(handle, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3284,7 +3284,7 @@ pub unsafe extern "system" fn cusolverDnDorgqr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgqr(handle, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3300,7 +3300,7 @@ pub unsafe extern "system" fn cusolverDnCungqr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungqr(handle, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3316,7 +3316,7 @@ pub unsafe extern "system" fn cusolverDnZungqr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungqr(handle, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3334,7 +3334,7 @@ pub unsafe extern "system" fn cusolverDnSormqr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sormqr_buffer_size(handle, side, trans, m, n, k, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -3352,7 +3352,7 @@ pub unsafe extern "system" fn cusolverDnDormqr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dormqr_buffer_size(handle, side, trans, m, n, k, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -3370,7 +3370,7 @@ pub unsafe extern "system" fn cusolverDnCunmqr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cunmqr_buffer_size(handle, side, trans, m, n, k, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -3388,7 +3388,7 @@ pub unsafe extern "system" fn cusolverDnZunmqr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zunmqr_buffer_size(handle, side, trans, m, n, k, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -3408,7 +3408,9 @@ pub unsafe extern "system" fn cusolverDnSormqr(
     lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sormqr(
+        handle, side, trans, m, n, k, A, lda, tau, C, ldc, work, lwork, devInfo,
+    )
 }
 
 #[no_mangle]
@@ -3428,7 +3430,9 @@ pub unsafe extern "system" fn cusolverDnDormqr(
     lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dormqr(
+        handle, side, trans, m, n, k, A, lda, tau, C, ldc, work, lwork, devInfo,
+    )
 }
 
 #[no_mangle]
@@ -3448,7 +3452,9 @@ pub unsafe extern "system" fn cusolverDnCunmqr(
     lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cunmqr(
+        handle, side, trans, m, n, k, A, lda, tau, C, ldc, work, lwork, devInfo,
+    )
 }
 
 #[no_mangle]
@@ -3468,7 +3474,9 @@ pub unsafe extern "system" fn cusolverDnZunmqr(
     lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zunmqr(
+        handle, side, trans, m, n, k, A, lda, tau, C, ldc, work, lwork, devInfo,
+    )
 }
 
 #[no_mangle]
@@ -3479,7 +3487,7 @@ pub unsafe extern "system" fn cusolverDnSsytrf_bufferSize(
     lda: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssytrf_buffer_size(handle, n, A, lda, lwork)
 }
 
 #[no_mangle]
@@ -3490,7 +3498,7 @@ pub unsafe extern "system" fn cusolverDnDsytrf_bufferSize(
     lda: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsytrf_buffer_size(handle, n, A, lda, lwork)
 }
 
 #[no_mangle]
@@ -3501,7 +3509,7 @@ pub unsafe extern "system" fn cusolverDnCsytrf_bufferSize(
     lda: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_csytrf_buffer_size(handle, n, A, lda, lwork)
 }
 
 #[no_mangle]
@@ -3512,7 +3520,7 @@ pub unsafe extern "system" fn cusolverDnZsytrf_bufferSize(
     lda: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zsytrf_buffer_size(handle, n, A, lda, lwork)
 }
 
 #[no_mangle]
@@ -3527,7 +3535,7 @@ pub unsafe extern "system" fn cusolverDnSsytrf(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssytrf(handle, uplo, n, A, lda, ipiv, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3542,7 +3550,7 @@ pub unsafe extern "system" fn cusolverDnDsytrf(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsytrf(handle, uplo, n, A, lda, ipiv, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3557,7 +3565,7 @@ pub unsafe extern "system" fn cusolverDnCsytrf(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_csytrf(handle, uplo, n, A, lda, ipiv, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3572,7 +3580,7 @@ pub unsafe extern "system" fn cusolverDnZsytrf(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zsytrf(handle, uplo, n, A, lda, ipiv, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3735,7 +3743,7 @@ pub unsafe extern "system" fn cusolverDnSgebrd_bufferSize(
     n: ::std::os::raw::c_int,
     Lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgebrd_buffer_size(handle, m, n, Lwork)
 }
 
 #[no_mangle]
@@ -3745,7 +3753,7 @@ pub unsafe extern "system" fn cusolverDnDgebrd_bufferSize(
     n: ::std::os::raw::c_int,
     Lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgebrd_buffer_size(handle, m, n, Lwork)
 }
 
 #[no_mangle]
@@ -3755,7 +3763,7 @@ pub unsafe extern "system" fn cusolverDnCgebrd_bufferSize(
     n: ::std::os::raw::c_int,
     Lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgebrd_buffer_size(handle, m, n, Lwork)
 }
 
 #[no_mangle]
@@ -3765,7 +3773,7 @@ pub unsafe extern "system" fn cusolverDnZgebrd_bufferSize(
     n: ::std::os::raw::c_int,
     Lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgebrd_buffer_size(handle, m, n, Lwork)
 }
 
 #[no_mangle]
@@ -3783,7 +3791,7 @@ pub unsafe extern "system" fn cusolverDnSgebrd(
     Lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgebrd(handle, m, n, A, lda, D, E, TAUQ, TAUP, Work, Lwork, devInfo)
 }
 
 #[no_mangle]
@@ -3801,7 +3809,7 @@ pub unsafe extern "system" fn cusolverDnDgebrd(
     Lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgebrd(handle, m, n, A, lda, D, E, TAUQ, TAUP, Work, Lwork, devInfo)
 }
 
 #[no_mangle]
@@ -3819,7 +3827,7 @@ pub unsafe extern "system" fn cusolverDnCgebrd(
     Lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgebrd(handle, m, n, A, lda, D, E, TAUQ, TAUP, Work, Lwork, devInfo)
 }
 
 #[no_mangle]
@@ -3837,7 +3845,7 @@ pub unsafe extern "system" fn cusolverDnZgebrd(
     Lwork: ::std::os::raw::c_int,
     devInfo: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgebrd(handle, m, n, A, lda, D, E, TAUQ, TAUP, Work, Lwork, devInfo)
 }
 
 #[no_mangle]
@@ -3852,7 +3860,7 @@ pub unsafe extern "system" fn cusolverDnSorgbr_bufferSize(
     tau: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgbr_buffer_size(handle, side, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3867,7 +3875,7 @@ pub unsafe extern "system" fn cusolverDnDorgbr_bufferSize(
     tau: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgbr_buffer_size(handle, side, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3882,7 +3890,7 @@ pub unsafe extern "system" fn cusolverDnCungbr_bufferSize(
     tau: *const cuComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungbr_buffer_size(handle, side, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3897,7 +3905,7 @@ pub unsafe extern "system" fn cusolverDnZungbr_bufferSize(
     tau: *const cuDoubleComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungbr_buffer_size(handle, side, m, n, k, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -3914,7 +3922,7 @@ pub unsafe extern "system" fn cusolverDnSorgbr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgbr(handle, side, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3931,7 +3939,7 @@ pub unsafe extern "system" fn cusolverDnDorgbr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgbr(handle, side, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3948,7 +3956,7 @@ pub unsafe extern "system" fn cusolverDnCungbr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungbr(handle, side, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3965,7 +3973,7 @@ pub unsafe extern "system" fn cusolverDnZungbr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungbr(handle, side, m, n, k, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -3980,7 +3988,7 @@ pub unsafe extern "system" fn cusolverDnSsytrd_bufferSize(
     tau: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssytrd_buffer_size(handle, uplo, n, A, lda, d, e, tau, lwork)
 }
 
 #[no_mangle]
@@ -3995,7 +4003,7 @@ pub unsafe extern "system" fn cusolverDnDsytrd_bufferSize(
     tau: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsytrd_buffer_size(handle, uplo, n, A, lda, d, e, tau, lwork)
 }
 
 #[no_mangle]
@@ -4010,7 +4018,7 @@ pub unsafe extern "system" fn cusolverDnChetrd_bufferSize(
     tau: *const cuComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chetrd_buffer_size(handle, uplo, n, A, lda, d, e, tau, lwork)
 }
 
 #[no_mangle]
@@ -4025,7 +4033,7 @@ pub unsafe extern "system" fn cusolverDnZhetrd_bufferSize(
     tau: *const cuDoubleComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhetrd_buffer_size(handle, uplo, n, A, lda, d, e, tau, lwork)
 }
 
 #[no_mangle]
@@ -4042,7 +4050,7 @@ pub unsafe extern "system" fn cusolverDnSsytrd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssytrd(handle, uplo, n, A, lda, d, e, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4059,7 +4067,7 @@ pub unsafe extern "system" fn cusolverDnDsytrd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsytrd(handle, uplo, n, A, lda, d, e, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4076,7 +4084,7 @@ pub unsafe extern "system" fn cusolverDnChetrd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chetrd(handle, uplo, n, A, lda, d, e, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4093,7 +4101,7 @@ pub unsafe extern "system" fn cusolverDnZhetrd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhetrd(handle, uplo, n, A, lda, d, e, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4106,7 +4114,7 @@ pub unsafe extern "system" fn cusolverDnSorgtr_bufferSize(
     tau: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgtr_buffer_size(handle, uplo, n, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -4119,7 +4127,7 @@ pub unsafe extern "system" fn cusolverDnDorgtr_bufferSize(
     tau: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgtr_buffer_size(handle, uplo, n, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -4132,7 +4140,7 @@ pub unsafe extern "system" fn cusolverDnCungtr_bufferSize(
     tau: *const cuComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungtr_buffer_size(handle, uplo, n, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -4145,7 +4153,7 @@ pub unsafe extern "system" fn cusolverDnZungtr_bufferSize(
     tau: *const cuDoubleComplex,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungtr_buffer_size(handle, uplo, n, A, lda, tau, lwork)
 }
 
 #[no_mangle]
@@ -4160,7 +4168,7 @@ pub unsafe extern "system" fn cusolverDnSorgtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sorgtr(handle, uplo, n, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4175,7 +4183,7 @@ pub unsafe extern "system" fn cusolverDnDorgtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dorgtr(handle, uplo, n, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4190,7 +4198,7 @@ pub unsafe extern "system" fn cusolverDnCungtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cungtr(handle, uplo, n, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4205,7 +4213,7 @@ pub unsafe extern "system" fn cusolverDnZungtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zungtr(handle, uplo, n, A, lda, tau, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4223,7 +4231,7 @@ pub unsafe extern "system" fn cusolverDnSormtr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sormtr_buffer_size(handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -4241,7 +4249,7 @@ pub unsafe extern "system" fn cusolverDnDormtr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dormtr_buffer_size(handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -4259,7 +4267,7 @@ pub unsafe extern "system" fn cusolverDnCunmtr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cunmtr_buffer_size(handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -4277,7 +4285,7 @@ pub unsafe extern "system" fn cusolverDnZunmtr_bufferSize(
     ldc: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zunmtr_buffer_size(handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, lwork)
 }
 
 #[no_mangle]
@@ -4297,7 +4305,9 @@ pub unsafe extern "system" fn cusolverDnSormtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sormtr(
+        handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4317,7 +4327,9 @@ pub unsafe extern "system" fn cusolverDnDormtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dormtr(
+        handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4337,7 +4349,9 @@ pub unsafe extern "system" fn cusolverDnCunmtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cunmtr(
+        handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4357,7 +4371,9 @@ pub unsafe extern "system" fn cusolverDnZunmtr(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zunmtr(
+        handle, side, uplo, trans, m, n, A, lda, tau, C, ldc, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4367,7 +4383,7 @@ pub unsafe extern "system" fn cusolverDnSgesvd_bufferSize(
     n: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvd_buffer_size(handle, m, n, lwork)
 }
 
 #[no_mangle]
@@ -4377,7 +4393,7 @@ pub unsafe extern "system" fn cusolverDnDgesvd_bufferSize(
     n: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvd_buffer_size(handle, m, n, lwork)
 }
 
 #[no_mangle]
@@ -4387,7 +4403,7 @@ pub unsafe extern "system" fn cusolverDnCgesvd_bufferSize(
     n: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvd_buffer_size(handle, m, n, lwork)
 }
 
 #[no_mangle]
@@ -4397,7 +4413,7 @@ pub unsafe extern "system" fn cusolverDnZgesvd_bufferSize(
     n: ::std::os::raw::c_int,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvd_buffer_size(handle, m, n, lwork)
 }
 
 #[no_mangle]
@@ -4419,7 +4435,9 @@ pub unsafe extern "system" fn cusolverDnSgesvd(
     rwork: *mut f32,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvd(
+        handle, jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4441,7 +4459,9 @@ pub unsafe extern "system" fn cusolverDnDgesvd(
     rwork: *mut f64,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvd(
+        handle, jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4463,7 +4483,9 @@ pub unsafe extern "system" fn cusolverDnCgesvd(
     rwork: *mut f32,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvd(
+        handle, jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4485,7 +4507,9 @@ pub unsafe extern "system" fn cusolverDnZgesvd(
     rwork: *mut f64,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvd(
+        handle, jobu, jobvt, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4499,7 +4523,7 @@ pub unsafe extern "system" fn cusolverDnSsyevd_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevd_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork)
 }
 
 #[no_mangle]
@@ -4513,7 +4537,7 @@ pub unsafe extern "system" fn cusolverDnDsyevd_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevd_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork)
 }
 
 #[no_mangle]
@@ -4527,7 +4551,7 @@ pub unsafe extern "system" fn cusolverDnCheevd_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevd_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork)
 }
 
 #[no_mangle]
@@ -4541,7 +4565,7 @@ pub unsafe extern "system" fn cusolverDnZheevd_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevd_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork)
 }
 
 #[no_mangle]
@@ -4557,7 +4581,7 @@ pub unsafe extern "system" fn cusolverDnSsyevd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevd(handle, jobz, uplo, n, A, lda, W, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4573,7 +4597,7 @@ pub unsafe extern "system" fn cusolverDnDsyevd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevd(handle, jobz, uplo, n, A, lda, W, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4589,7 +4613,7 @@ pub unsafe extern "system" fn cusolverDnCheevd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevd(handle, jobz, uplo, n, A, lda, W, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4605,7 +4629,7 @@ pub unsafe extern "system" fn cusolverDnZheevd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevd(handle, jobz, uplo, n, A, lda, W, work, lwork, info)
 }
 
 #[no_mangle]
@@ -4625,7 +4649,9 @@ pub unsafe extern "system" fn cusolverDnSsyevdx_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevdx_buffer_size(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4645,7 +4671,9 @@ pub unsafe extern "system" fn cusolverDnDsyevdx_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevdx_buffer_size(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4665,7 +4693,9 @@ pub unsafe extern "system" fn cusolverDnCheevdx_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevdx_buffer_size(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4685,7 +4715,9 @@ pub unsafe extern "system" fn cusolverDnZheevdx_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevdx_buffer_size(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4707,7 +4739,9 @@ pub unsafe extern "system" fn cusolverDnSsyevdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevdx(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4729,7 +4763,9 @@ pub unsafe extern "system" fn cusolverDnDsyevdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevdx(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4751,7 +4787,9 @@ pub unsafe extern "system" fn cusolverDnCheevdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevdx(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4773,7 +4811,9 @@ pub unsafe extern "system" fn cusolverDnZheevdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevdx(
+        handle, jobz, range, uplo, n, A, lda, vl, vu, il, iu, meig, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -4796,7 +4836,9 @@ pub unsafe extern "system" fn cusolverDnSsygvdx_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvdx_buffer_size(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4819,7 +4861,9 @@ pub unsafe extern "system" fn cusolverDnDsygvdx_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvdx_buffer_size(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4842,7 +4886,9 @@ pub unsafe extern "system" fn cusolverDnChegvdx_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvdx_buffer_size(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4865,7 +4911,9 @@ pub unsafe extern "system" fn cusolverDnZhegvdx_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvdx_buffer_size(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, lwork,
+    )
 }
 
 #[no_mangle]
@@ -4890,7 +4938,10 @@ pub unsafe extern "system" fn cusolverDnSsygvdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvdx(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, work, lwork,
+        info,
+    )
 }
 
 #[no_mangle]
@@ -4915,7 +4966,10 @@ pub unsafe extern "system" fn cusolverDnDsygvdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvdx(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, work, lwork,
+        info,
+    )
 }
 
 #[no_mangle]
@@ -4940,7 +4994,10 @@ pub unsafe extern "system" fn cusolverDnChegvdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvdx(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, work, lwork,
+        info,
+    )
 }
 
 #[no_mangle]
@@ -4965,7 +5022,10 @@ pub unsafe extern "system" fn cusolverDnZhegvdx(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvdx(
+        handle, itype, jobz, range, uplo, n, A, lda, B, ldb, vl, vu, il, iu, meig, W, work, lwork,
+        info,
+    )
 }
 
 #[no_mangle]
@@ -4982,7 +5042,7 @@ pub unsafe extern "system" fn cusolverDnSsygvd_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvd_buffer_size(handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork)
 }
 
 #[no_mangle]
@@ -4999,7 +5059,7 @@ pub unsafe extern "system" fn cusolverDnDsygvd_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvd_buffer_size(handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork)
 }
 
 #[no_mangle]
@@ -5016,7 +5076,7 @@ pub unsafe extern "system" fn cusolverDnChegvd_bufferSize(
     W: *const f32,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvd_buffer_size(handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork)
 }
 
 #[no_mangle]
@@ -5033,7 +5093,7 @@ pub unsafe extern "system" fn cusolverDnZhegvd_bufferSize(
     W: *const f64,
     lwork: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvd_buffer_size(handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork)
 }
 
 #[no_mangle]
@@ -5052,7 +5112,9 @@ pub unsafe extern "system" fn cusolverDnSsygvd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvd(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -5071,7 +5133,9 @@ pub unsafe extern "system" fn cusolverDnDsygvd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvd(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -5090,7 +5154,9 @@ pub unsafe extern "system" fn cusolverDnChegvd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvd(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
@@ -5109,19 +5175,21 @@ pub unsafe extern "system" fn cusolverDnZhegvd(
     lwork: ::std::os::raw::c_int,
     info: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvd(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info,
+    )
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverDnCreateSyevjInfo(
     info: *mut syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_create_syevj_info(info)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverDnDestroySyevjInfo(info: syevjInfo_t) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_destroy_syevj_info(info)
 }
 
 #[no_mangle]
@@ -5129,7 +5197,7 @@ pub unsafe extern "system" fn cusolverDnXsyevjSetTolerance(
     info: syevjInfo_t,
     tolerance: f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xsyevj_set_tolerance(info, tolerance)
 }
 
 #[no_mangle]
@@ -5137,7 +5205,7 @@ pub unsafe extern "system" fn cusolverDnXsyevjSetMaxSweeps(
     info: syevjInfo_t,
     max_sweeps: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xsyevj_set_max_sweeps(info, max_sweeps)
 }
 
 #[no_mangle]
@@ -5145,7 +5213,7 @@ pub unsafe extern "system" fn cusolverDnXsyevjSetSortEig(
     info: syevjInfo_t,
     sort_eig: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xsyevj_set_sort_eig(info, sort_eig)
 }
 
 #[no_mangle]
@@ -5154,7 +5222,7 @@ pub unsafe extern "system" fn cusolverDnXsyevjGetResidual(
     info: syevjInfo_t,
     residual: *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xsyevj_get_residual(handle, info, residual)
 }
 
 #[no_mangle]
@@ -5163,7 +5231,7 @@ pub unsafe extern "system" fn cusolverDnXsyevjGetSweeps(
     info: syevjInfo_t,
     executed_sweeps: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xsyevj_get_sweeps(handle, info, executed_sweeps)
 }
 
 #[no_mangle]
@@ -5179,7 +5247,7 @@ pub unsafe extern "system" fn cusolverDnSsyevjBatched_bufferSize(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevj_batched_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params, batchSize)
 }
 
 #[no_mangle]
@@ -5195,7 +5263,7 @@ pub unsafe extern "system" fn cusolverDnDsyevjBatched_bufferSize(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevj_batched_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params, batchSize)
 }
 
 #[no_mangle]
@@ -5211,7 +5279,7 @@ pub unsafe extern "system" fn cusolverDnCheevjBatched_bufferSize(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevj_batched_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params, batchSize)
 }
 
 #[no_mangle]
@@ -5227,7 +5295,7 @@ pub unsafe extern "system" fn cusolverDnZheevjBatched_bufferSize(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevj_batched_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params, batchSize)
 }
 
 #[no_mangle]
@@ -5245,7 +5313,9 @@ pub unsafe extern "system" fn cusolverDnSsyevjBatched(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevj_batched(
+        handle, jobz, uplo, n, A, lda, W, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5263,7 +5333,9 @@ pub unsafe extern "system" fn cusolverDnDsyevjBatched(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevj_batched(
+        handle, jobz, uplo, n, A, lda, W, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5281,7 +5353,9 @@ pub unsafe extern "system" fn cusolverDnCheevjBatched(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevj_batched(
+        handle, jobz, uplo, n, A, lda, W, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5299,7 +5373,9 @@ pub unsafe extern "system" fn cusolverDnZheevjBatched(
     params: syevjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevj_batched(
+        handle, jobz, uplo, n, A, lda, W, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5314,7 +5390,7 @@ pub unsafe extern "system" fn cusolverDnSsyevj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevj_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params)
 }
 
 #[no_mangle]
@@ -5329,7 +5405,7 @@ pub unsafe extern "system" fn cusolverDnDsyevj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevj_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params)
 }
 
 #[no_mangle]
@@ -5344,7 +5420,7 @@ pub unsafe extern "system" fn cusolverDnCheevj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevj_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params)
 }
 
 #[no_mangle]
@@ -5359,7 +5435,7 @@ pub unsafe extern "system" fn cusolverDnZheevj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevj_buffer_size(handle, jobz, uplo, n, A, lda, W, lwork, params)
 }
 
 #[no_mangle]
@@ -5376,7 +5452,7 @@ pub unsafe extern "system" fn cusolverDnSsyevj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssyevj(handle, jobz, uplo, n, A, lda, W, work, lwork, info, params)
 }
 
 #[no_mangle]
@@ -5393,7 +5469,7 @@ pub unsafe extern "system" fn cusolverDnDsyevj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsyevj(handle, jobz, uplo, n, A, lda, W, work, lwork, info, params)
 }
 
 #[no_mangle]
@@ -5410,7 +5486,7 @@ pub unsafe extern "system" fn cusolverDnCheevj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cheevj(handle, jobz, uplo, n, A, lda, W, work, lwork, info, params)
 }
 
 #[no_mangle]
@@ -5427,7 +5503,7 @@ pub unsafe extern "system" fn cusolverDnZheevj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zheevj(handle, jobz, uplo, n, A, lda, W, work, lwork, info, params)
 }
 
 #[no_mangle]
@@ -5445,7 +5521,9 @@ pub unsafe extern "system" fn cusolverDnSsygvj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvj_buffer_size(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5463,7 +5541,9 @@ pub unsafe extern "system" fn cusolverDnDsygvj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvj_buffer_size(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5481,7 +5561,9 @@ pub unsafe extern "system" fn cusolverDnChegvj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvj_buffer_size(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5499,7 +5581,9 @@ pub unsafe extern "system" fn cusolverDnZhegvj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvj_buffer_size(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5519,7 +5603,9 @@ pub unsafe extern "system" fn cusolverDnSsygvj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_ssygvj(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5539,7 +5625,9 @@ pub unsafe extern "system" fn cusolverDnDsygvj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dsygvj(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5559,7 +5647,9 @@ pub unsafe extern "system" fn cusolverDnChegvj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_chegvj(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5579,19 +5669,21 @@ pub unsafe extern "system" fn cusolverDnZhegvj(
     info: *mut ::std::os::raw::c_int,
     params: syevjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zhegvj(
+        handle, itype, jobz, uplo, n, A, lda, B, ldb, W, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverDnCreateGesvdjInfo(
     info: *mut gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_create_gesvdj_info(info)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverDnDestroyGesvdjInfo(info: gesvdjInfo_t) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_destroy_gesvdj_info(info)
 }
 
 #[no_mangle]
@@ -5599,7 +5691,7 @@ pub unsafe extern "system" fn cusolverDnXgesvdjSetTolerance(
     info: gesvdjInfo_t,
     tolerance: f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xgesvdj_set_tolerance(info, tolerance)
 }
 
 #[no_mangle]
@@ -5607,7 +5699,7 @@ pub unsafe extern "system" fn cusolverDnXgesvdjSetMaxSweeps(
     info: gesvdjInfo_t,
     max_sweeps: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xgesvdj_set_max_sweeps(info, max_sweeps)
 }
 
 #[no_mangle]
@@ -5615,7 +5707,7 @@ pub unsafe extern "system" fn cusolverDnXgesvdjSetSortEig(
     info: gesvdjInfo_t,
     sort_svd: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xgesvdj_set_sort_eig(info, sort_svd)
 }
 
 #[no_mangle]
@@ -5624,7 +5716,7 @@ pub unsafe extern "system" fn cusolverDnXgesvdjGetResidual(
     info: gesvdjInfo_t,
     residual: *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xgesvdj_get_residual(handle, info, residual)
 }
 
 #[no_mangle]
@@ -5633,7 +5725,7 @@ pub unsafe extern "system" fn cusolverDnXgesvdjGetSweeps(
     info: gesvdjInfo_t,
     executed_sweeps: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_xgesvdj_get_sweeps(handle, info, executed_sweeps)
 }
 
 #[no_mangle]
@@ -5653,7 +5745,9 @@ pub unsafe extern "system" fn cusolverDnSgesvdjBatched_bufferSize(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvdj_batched_buffer_size(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, lwork, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5673,7 +5767,9 @@ pub unsafe extern "system" fn cusolverDnDgesvdjBatched_bufferSize(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvdj_batched_buffer_size(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, lwork, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5693,7 +5789,9 @@ pub unsafe extern "system" fn cusolverDnCgesvdjBatched_bufferSize(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvdj_batched_buffer_size(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, lwork, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5713,7 +5811,9 @@ pub unsafe extern "system" fn cusolverDnZgesvdjBatched_bufferSize(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvdj_batched_buffer_size(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, lwork, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5735,7 +5835,9 @@ pub unsafe extern "system" fn cusolverDnSgesvdjBatched(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvdj_batched(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5757,7 +5859,9 @@ pub unsafe extern "system" fn cusolverDnDgesvdjBatched(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvdj_batched(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5779,7 +5883,9 @@ pub unsafe extern "system" fn cusolverDnCgesvdjBatched(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvdj_batched(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5801,7 +5907,9 @@ pub unsafe extern "system" fn cusolverDnZgesvdjBatched(
     params: gesvdjInfo_t,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvdj_batched(
+        handle, jobz, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -5821,7 +5929,9 @@ pub unsafe extern "system" fn cusolverDnSgesvdj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvdj_buffer_size(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5841,7 +5951,9 @@ pub unsafe extern "system" fn cusolverDnDgesvdj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvdj_buffer_size(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5861,7 +5973,9 @@ pub unsafe extern "system" fn cusolverDnCgesvdj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvdj_buffer_size(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5881,7 +5995,9 @@ pub unsafe extern "system" fn cusolverDnZgesvdj_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvdj_buffer_size(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, lwork, params,
+    )
 }
 
 #[no_mangle]
@@ -5903,7 +6019,9 @@ pub unsafe extern "system" fn cusolverDnSgesvdj(
     info: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvdj(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5925,7 +6043,9 @@ pub unsafe extern "system" fn cusolverDnDgesvdj(
     info: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvdj(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5947,7 +6067,9 @@ pub unsafe extern "system" fn cusolverDnCgesvdj(
     info: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvdj(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5969,7 +6091,9 @@ pub unsafe extern "system" fn cusolverDnZgesvdj(
     info: *mut ::std::os::raw::c_int,
     params: gesvdjInfo_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvdj(
+        handle, jobz, econ, m, n, A, lda, S, U, ldu, V, ldv, work, lwork, info, params,
+    )
 }
 
 #[no_mangle]
@@ -5993,7 +6117,10 @@ pub unsafe extern "system" fn cusolverDnSgesvdaStridedBatched_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvda_strided_batched_buffer_size(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, lwork, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6017,7 +6144,10 @@ pub unsafe extern "system" fn cusolverDnDgesvdaStridedBatched_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvda_strided_batched_buffer_size(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, lwork, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6041,7 +6171,10 @@ pub unsafe extern "system" fn cusolverDnCgesvdaStridedBatched_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvda_strided_batched_buffer_size(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, lwork, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6065,7 +6198,10 @@ pub unsafe extern "system" fn cusolverDnZgesvdaStridedBatched_bufferSize(
     lwork: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvda_strided_batched_buffer_size(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, lwork, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6092,7 +6228,10 @@ pub unsafe extern "system" fn cusolverDnSgesvdaStridedBatched(
     h_R_nrmF: *mut f64,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_sgesvda_strided_batched(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, d_work, lwork, d_info, h_R_nrmF, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6119,7 +6258,10 @@ pub unsafe extern "system" fn cusolverDnDgesvdaStridedBatched(
     h_R_nrmF: *mut f64,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_dgesvda_strided_batched(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, d_work, lwork, d_info, h_R_nrmF, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6146,7 +6288,10 @@ pub unsafe extern "system" fn cusolverDnCgesvdaStridedBatched(
     h_R_nrmF: *mut f64,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_cgesvda_strided_batched(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, d_work, lwork, d_info, h_R_nrmF, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -6173,7 +6318,10 @@ pub unsafe extern "system" fn cusolverDnZgesvdaStridedBatched(
     h_R_nrmF: *mut f64,
     batchSize: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::dn_zgesvda_strided_batched(
+        handle, jobz, rank, m, n, d_A, lda, strideA, d_S, strideS, d_U, ldu, strideU, d_V, ldv,
+        strideV, d_work, lwork, d_info, h_R_nrmF, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -8061,12 +8209,12 @@ pub type cusolverRfHandle_t = *mut cusolverRfCommon;
 pub unsafe extern "system" fn cusolverRfCreate(
     handle: *mut cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_create(handle)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverRfDestroy(handle: cusolverRfHandle_t) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_destroy(handle)
 }
 
 #[no_mangle]
@@ -8075,7 +8223,7 @@ pub unsafe extern "system" fn cusolverRfGetMatrixFormat(
     format: *mut cusolverRfMatrixFormat_t,
     diag: *mut cusolverRfUnitDiagonal_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_get_matrix_format(handle, format, diag)
 }
 
 #[no_mangle]
@@ -8084,7 +8232,7 @@ pub unsafe extern "system" fn cusolverRfSetMatrixFormat(
     format: cusolverRfMatrixFormat_t,
     diag: cusolverRfUnitDiagonal_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_set_matrix_format(handle, format, diag)
 }
 
 #[no_mangle]
@@ -8093,7 +8241,7 @@ pub unsafe extern "system" fn cusolverRfSetNumericProperties(
     zero: f64,
     boost: f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_set_numeric_properties(handle, zero, boost)
 }
 
 #[no_mangle]
@@ -8102,7 +8250,7 @@ pub unsafe extern "system" fn cusolverRfGetNumericProperties(
     zero: *mut f64,
     boost: *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_get_numeric_properties(handle, zero, boost)
 }
 
 #[no_mangle]
@@ -8110,7 +8258,7 @@ pub unsafe extern "system" fn cusolverRfGetNumericBoostReport(
     handle: cusolverRfHandle_t,
     report: *mut cusolverRfNumericBoostReport_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_get_numeric_boost_report(handle, report)
 }
 
 #[no_mangle]
@@ -8119,7 +8267,7 @@ pub unsafe extern "system" fn cusolverRfSetAlgs(
     factAlg: cusolverRfFactorization_t,
     solveAlg: cusolverRfTriangularSolve_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_set_algs(handle, factAlg, solveAlg)
 }
 
 #[no_mangle]
@@ -8128,7 +8276,7 @@ pub unsafe extern "system" fn cusolverRfGetAlgs(
     factAlg: *mut cusolverRfFactorization_t,
     solveAlg: *mut cusolverRfTriangularSolve_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_get_algs(handle, factAlg, solveAlg)
 }
 
 #[no_mangle]
@@ -8136,7 +8284,7 @@ pub unsafe extern "system" fn cusolverRfGetResetValuesFastMode(
     handle: cusolverRfHandle_t,
     fastMode: *mut cusolverRfResetValuesFastMode_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_get_reset_values_fast_mode(handle, fastMode)
 }
 
 #[no_mangle]
@@ -8144,7 +8292,7 @@ pub unsafe extern "system" fn cusolverRfSetResetValuesFastMode(
     handle: cusolverRfHandle_t,
     fastMode: cusolverRfResetValuesFastMode_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_set_reset_values_fast_mode(handle, fastMode)
 }
 
 #[doc = " Non-Batched Routines"]
@@ -8167,7 +8315,24 @@ pub unsafe extern "system" fn cusolverRfSetupHost(
     h_Q: *mut ::std::os::raw::c_int,
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_setup_host(
+        n,
+        nnzA,
+        h_csrRowPtrA,
+        h_csrColIndA,
+        h_csrValA,
+        nnzL,
+        h_csrRowPtrL,
+        h_csrColIndL,
+        h_csrValL,
+        nnzU,
+        h_csrRowPtrU,
+        h_csrColIndU,
+        h_csrValU,
+        h_P,
+        h_Q,
+        handle,
+    )
 }
 
 #[no_mangle]
@@ -8189,7 +8354,10 @@ pub unsafe extern "system" fn cusolverRfSetupDevice(
     Q: *mut ::std::os::raw::c_int,
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_setup_device(
+        n, nnzA, csrRowPtrA, csrColIndA, csrValA, nnzL, csrRowPtrL, csrColIndL, csrValL, nnzU,
+        csrRowPtrU, csrColIndU, csrValU, P, Q, handle,
+    )
 }
 
 #[no_mangle]
@@ -8203,17 +8371,17 @@ pub unsafe extern "system" fn cusolverRfResetValues(
     Q: *mut ::std::os::raw::c_int,
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_reset_values(n, nnzA, csrRowPtrA, csrColIndA, csrValA, P, Q, handle)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverRfAnalyze(handle: cusolverRfHandle_t) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_analyze(handle)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverRfRefactor(handle: cusolverRfHandle_t) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_refactor(handle)
 }
 
 #[no_mangle]
@@ -8224,7 +8392,7 @@ pub unsafe extern "system" fn cusolverRfAccessBundledFactorsDevice(
     Mi: *mut *mut ::std::os::raw::c_int,
     Mx: *mut *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_access_bundled_factors_device(handle, nnzM, Mp, Mi, Mx)
 }
 
 #[no_mangle]
@@ -8235,7 +8403,7 @@ pub unsafe extern "system" fn cusolverRfExtractBundledFactorsHost(
     h_Mi: *mut *mut ::std::os::raw::c_int,
     h_Mx: *mut *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_extract_bundled_factors_host(handle, h_nnzM, h_Mp, h_Mi, h_Mx)
 }
 
 #[no_mangle]
@@ -8250,7 +8418,17 @@ pub unsafe extern "system" fn cusolverRfExtractSplitFactorsHost(
     h_csrColIndU: *mut *mut ::std::os::raw::c_int,
     h_csrValU: *mut *mut f64,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_extract_split_factors_host(
+        handle,
+        h_nnzL,
+        h_csrRowPtrL,
+        h_csrColIndL,
+        h_csrValL,
+        h_nnzU,
+        h_csrRowPtrU,
+        h_csrColIndU,
+        h_csrValU,
+    )
 }
 
 #[no_mangle]
@@ -8264,7 +8442,7 @@ pub unsafe extern "system" fn cusolverRfSolve(
     XF: *mut f64,
     ldxf: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_solve(handle, P, Q, nrhs, Temp, ldt, XF, ldxf)
 }
 
 #[doc = " Batched Routines"]
@@ -8288,7 +8466,25 @@ pub unsafe extern "system" fn cusolverRfBatchSetupHost(
     h_Q: *mut ::std::os::raw::c_int,
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_setup_host(
+        batchSize,
+        n,
+        nnzA,
+        h_csrRowPtrA,
+        h_csrColIndA,
+        h_csrValA_array,
+        nnzL,
+        h_csrRowPtrL,
+        h_csrColIndL,
+        h_csrValL,
+        nnzU,
+        h_csrRowPtrU,
+        h_csrColIndU,
+        h_csrValU,
+        h_P,
+        h_Q,
+        handle,
+    )
 }
 
 #[no_mangle]
@@ -8303,21 +8499,31 @@ pub unsafe extern "system" fn cusolverRfBatchResetValues(
     Q: *mut ::std::os::raw::c_int,
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_reset_values(
+        batchSize,
+        n,
+        nnzA,
+        csrRowPtrA,
+        csrColIndA,
+        csrValA_array,
+        P,
+        Q,
+        handle,
+    )
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverRfBatchAnalyze(
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_analyze(handle)
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cusolverRfBatchRefactor(
     handle: cusolverRfHandle_t,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_refactor(handle)
 }
 
 #[no_mangle]
@@ -8331,7 +8537,7 @@ pub unsafe extern "system" fn cusolverRfBatchSolve(
     XF_array: *mut *mut f64,
     ldxf: ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_solve(handle, P, Q, nrhs, Temp, ldt, XF_array, ldxf)
 }
 
 #[no_mangle]
@@ -8339,5 +8545,5 @@ pub unsafe extern "system" fn cusolverRfBatchZeroPivot(
     handle: cusolverRfHandle_t,
     position: *mut ::std::os::raw::c_int,
 ) -> cusolverStatus_t {
-    crate::unsupported()
+    crate::rf_batch_zero_pivot(handle, position)
 }

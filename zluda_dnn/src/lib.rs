@@ -547,9 +547,6 @@ unsafe fn convolution_forward(
 fn algo_from_cudnn(algo: cudnnConvolutionFwdAlgo_t) -> miopenConvFwdAlgorithm_t {
     match algo {
         cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM => {
-            miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoImplicitGEMM
-        }
-        cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM => {
             miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoGEMM
         }
         cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_GEMM => {
@@ -561,16 +558,10 @@ fn algo_from_cudnn(algo: cudnnConvolutionFwdAlgo_t) -> miopenConvFwdAlgorithm_t 
         cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_FFT => {
             miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoFFT
         }
-        cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_FFT_TILING => {
-            miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoFFT
-        }
         cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD => {
             miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoWinograd
         }
-        cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED => {
-            miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoWinograd
-        }
-        _ => miopenConvFwdAlgorithm_t::miopenConvolutionFwdAlgoGEMM,
+        _ => panic!(),
     }
 }
 
