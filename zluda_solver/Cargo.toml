@@ -1,0 +1,20 @@
+[package]
+name = "zluda-solver"
+version = "0.0.0"
+authors = ["dwwdyxiang@gmail.com"]
+edition = "2018"
+
+[lib]
+name = "cusolver"
+crate-type = ["cdylib"]
+
+[dependencies]
+hipsolver-sys = { path = "../hipsolver-sys" }
+hip_common = { path = "../hip_common" }
+cuda_types = { path = "../cuda_types" }
+zluda_dark_api = { path = "../zluda_dark_api" }
+
+[package.metadata.zluda]
+linux_only = true
+linux_names = ["libcusolver.so.11"]
+dump_names = ["libcusolver.so"]

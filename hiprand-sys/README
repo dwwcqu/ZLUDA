@@ -1,0 +1,1 @@
+bindgen /opt/rocm/include/hiprand/hiprand.h -o src/hiprand.rs --no-layout-tests --default-enum-style=newtype --no-derive-debug --allowlist-function "hiprand.*" --must-use-type hiprandStatus_t -- -I/opt/rocm/include -D__HIP_PLATFORM_AMD__

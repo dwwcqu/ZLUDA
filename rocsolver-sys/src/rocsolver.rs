@@ -11504,3 +11504,52 @@ extern "C" {
         rfinfo: rocsolver_rfinfo,
     ) -> rocblas_status;
 }
+
+extern "C" {
+    #[must_use]
+    pub fn rocsolver_sgeqrf_ptr_batched(
+        handle: rocblas_handle,
+        m: rocblas_int,
+        n: rocblas_int,
+        A: *const *mut f32,
+        lda: rocblas_int,
+        ipiv: *const *mut f32,
+        batch_count: rocblas_int,
+    ) -> rocblas_status;
+}
+extern "C" {
+    #[must_use]
+    pub fn rocsolver_dgeqrf_ptr_batched(
+        handle: rocblas_handle,
+        m: rocblas_int,
+        n: rocblas_int,
+        A: *const *mut f64,
+        lda: rocblas_int,
+        ipiv: *const *mut f64,
+        batch_count: rocblas_int,
+    ) -> rocblas_status;
+}
+extern "C" {
+    #[must_use]
+    pub fn rocsolver_cgeqrf_ptr_batched(
+        handle: rocblas_handle,
+        m: rocblas_int,
+        n: rocblas_int,
+        A: *const *mut rocblas_float_complex,
+        lda: rocblas_int,
+        ipiv: *const *mut rocblas_float_complex,
+        batch_count: rocblas_int,
+    ) -> rocblas_status;
+}
+extern "C" {
+    #[must_use]
+    pub fn rocsolver_zgeqrf_ptr_batched(
+        handle: rocblas_handle,
+        m: rocblas_int,
+        n: rocblas_int,
+        A: *const *mut rocblas_double_complex,
+        lda: rocblas_int,
+        ipiv: *const *mut rocblas_double_complex,
+        batch_count: rocblas_int,
+    ) -> rocblas_status;
+}

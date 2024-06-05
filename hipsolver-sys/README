@@ -1,0 +1,1 @@
+bindgen /opt/rocm/include/hipsolver/hipsolver.h -o src/hipsolver.rs --no-layout-tests --default-enum-style=newtype --no-derive-debug --allowlist-function "hipsolver.*" --must-use-type hipsolverStatus_t -- -I/opt/rocm/include -D__HIP_PLATFORM_AMD__

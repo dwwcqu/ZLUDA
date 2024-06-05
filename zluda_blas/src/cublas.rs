@@ -441,7 +441,7 @@ pub unsafe extern "system" fn cublasGetVersion_v2(
     handle: cublasHandle_t,
     version: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -449,7 +449,7 @@ pub unsafe extern "system" fn cublasGetProperty(
     type_: libraryPropertyType,
     value: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -479,7 +479,7 @@ pub unsafe extern "system" fn cublasGetStream_v2(
     handle: cublasHandle_t,
     streamId: *mut cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_stream(handle, streamId)
 }
 
 #[no_mangle]
@@ -503,7 +503,7 @@ pub unsafe extern "system" fn cublasGetAtomicsMode(
     handle: cublasHandle_t,
     mode: *mut cublasAtomicsMode_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_atomics_mode(handle, mode)
 }
 
 #[no_mangle]
@@ -511,7 +511,7 @@ pub unsafe extern "system" fn cublasSetAtomicsMode(
     handle: cublasHandle_t,
     mode: cublasAtomicsMode_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_atomics_mode(handle, mode)
 }
 
 #[no_mangle]
@@ -536,7 +536,7 @@ pub unsafe extern "system" fn cublasGetSmCountTarget(
     handle: cublasHandle_t,
     smCountTarget: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -544,7 +544,7 @@ pub unsafe extern "system" fn cublasSetSmCountTarget(
     handle: cublasHandle_t,
     smCountTarget: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -571,21 +571,21 @@ pub unsafe extern "system" fn cublasLoggerConfigure(
     logToStdErr: ::std::os::raw::c_int,
     logFileName: *const ::std::os::raw::c_char,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasSetLoggerCallback(
     userCallback: cublasLogCallback,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasGetLoggerCallback(
     userCallback: *mut cublasLogCallback,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -597,7 +597,7 @@ pub unsafe extern "system" fn cublasSetVector(
     devicePtr: *mut ::std::os::raw::c_void,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_vector(n, elemSize, x, incx, devicePtr, incy)
 }
 
 #[no_mangle]
@@ -609,7 +609,7 @@ pub unsafe extern "system" fn cublasGetVector(
     y: *mut ::std::os::raw::c_void,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_vector(n, elemSize, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -622,7 +622,7 @@ pub unsafe extern "system" fn cublasSetMatrix(
     B: *mut ::std::os::raw::c_void,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_matrix(rows, cols, elemSize, A, lda, B, ldb)
 }
 
 #[no_mangle]
@@ -635,7 +635,7 @@ pub unsafe extern "system" fn cublasGetMatrix(
     B: *mut ::std::os::raw::c_void,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_matrix(rows, cols, elemSize, A, lda, B, ldb)
 }
 
 #[no_mangle]
@@ -648,7 +648,7 @@ pub unsafe extern "system" fn cublasSetVectorAsync(
     incy: ::std::os::raw::c_int,
     stream: cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_vector_async(n, elemSize, hostPtr, incx, devicePtr, incy, stream)
 }
 
 #[no_mangle]
@@ -661,7 +661,7 @@ pub unsafe extern "system" fn cublasGetVectorAsync(
     incy: ::std::os::raw::c_int,
     stream: cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_vector_async(n, elemSize, devicePtr, incx, hostPtr, incy, stream)
 }
 
 #[no_mangle]
@@ -675,7 +675,7 @@ pub unsafe extern "system" fn cublasSetMatrixAsync(
     ldb: ::std::os::raw::c_int,
     stream: cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::set_matrix_async(rows, cols, elemSize, A, lda, B, ldb, stream)
 }
 
 #[no_mangle]
@@ -689,7 +689,7 @@ pub unsafe extern "system" fn cublasGetMatrixAsync(
     ldb: ::std::os::raw::c_int,
     stream: cudaStream_t,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::get_matrix_async(rows, cols, elemSize, A, lda, B, ldb, stream)
 }
 
 #[no_mangle]
@@ -711,7 +711,7 @@ pub unsafe extern "system" fn cublasNrm2Ex(
     resultType: cudaDataType,
     executionType: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::nrm2_ex(handle, n, x, xType, incx, result, resultType, executionType)
 }
 
 #[no_mangle]
@@ -722,7 +722,7 @@ pub unsafe extern "system" fn cublasSnrm2_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::snrm2_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -744,7 +744,7 @@ pub unsafe extern "system" fn cublasScnrm2_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::scnrm2_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -755,7 +755,7 @@ pub unsafe extern "system" fn cublasDznrm2_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dznrm2_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -772,7 +772,19 @@ pub unsafe extern "system" fn cublasDotEx(
     resultType: cudaDataType,
     executionType: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dot_ex(
+        handle,
+        n,
+        x,
+        xType,
+        incx,
+        y,
+        yType,
+        incy,
+        result,
+        resultType,
+        executionType,
+    )
 }
 
 #[no_mangle]
@@ -789,7 +801,19 @@ pub unsafe extern "system" fn cublasDotcEx(
     resultType: cudaDataType,
     executionType: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dotc_ex(
+        handle,
+        n,
+        x,
+        xType,
+        incx,
+        y,
+        yType,
+        incy,
+        result,
+        resultType,
+        executionType,
+    )
 }
 
 #[no_mangle]
@@ -802,7 +826,7 @@ pub unsafe extern "system" fn cublasSdot_v2(
     incy: ::std::os::raw::c_int,
     result: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sdot_v2(handle, n, x, incx, y, incy, result)
 }
 
 #[no_mangle]
@@ -828,7 +852,7 @@ pub unsafe extern "system" fn cublasCdotu_v2(
     incy: ::std::os::raw::c_int,
     result: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cdotu_v2(handle, n, x, incx, y, incy, result)
 }
 
 #[no_mangle]
@@ -841,7 +865,7 @@ pub unsafe extern "system" fn cublasCdotc_v2(
     incy: ::std::os::raw::c_int,
     result: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cdotc_v2(handle, n, x, incx, y, incy, result)
 }
 
 #[no_mangle]
@@ -854,7 +878,7 @@ pub unsafe extern "system" fn cublasZdotu_v2(
     incy: ::std::os::raw::c_int,
     result: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zdotu_v2(handle, n, x, incx, y, incy, result)
 }
 
 #[no_mangle]
@@ -867,7 +891,7 @@ pub unsafe extern "system" fn cublasZdotc_v2(
     incy: ::std::os::raw::c_int,
     result: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zdotc_v2(handle, n, x, incx, y, incy, result)
 }
 
 #[no_mangle]
@@ -881,7 +905,7 @@ pub unsafe extern "system" fn cublasScalEx(
     incx: ::std::os::raw::c_int,
     executionType: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::scal_ex(handle, n, alpha, alphaType, x, xType, incx, executionType)
 }
 
 #[no_mangle]
@@ -892,7 +916,7 @@ pub unsafe extern "system" fn cublasSscal_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sscal_v2(handle, n, alpha, x, incx)
 }
 
 #[no_mangle]
@@ -914,7 +938,7 @@ pub unsafe extern "system" fn cublasCscal_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cscal_v2(handle, n, alpha, x, incx)
 }
 
 #[no_mangle]
@@ -925,7 +949,7 @@ pub unsafe extern "system" fn cublasCsscal_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csscal_v2(handle, n, alpha, x, incx)
 }
 
 #[no_mangle]
@@ -936,7 +960,7 @@ pub unsafe extern "system" fn cublasZscal_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zscal_v2(handle, n, alpha, x, incx)
 }
 
 #[no_mangle]
@@ -947,7 +971,7 @@ pub unsafe extern "system" fn cublasZdscal_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zdscal_v2(handle, n, alpha, x, incx)
 }
 
 #[no_mangle]
@@ -964,7 +988,19 @@ pub unsafe extern "system" fn cublasAxpyEx(
     incy: ::std::os::raw::c_int,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::axpy_ex(
+        handle,
+        n,
+        alpha,
+        alphaType,
+        x,
+        xType,
+        incx,
+        y,
+        yType,
+        incy,
+        executiontype,
+    )
 }
 
 #[no_mangle]
@@ -977,7 +1013,7 @@ pub unsafe extern "system" fn cublasSaxpy_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::saxpy_v2(handle, n, alpha, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1003,7 +1039,7 @@ pub unsafe extern "system" fn cublasCaxpy_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::caxpy_v2(handle, n, alpha, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1016,7 +1052,7 @@ pub unsafe extern "system" fn cublasZaxpy_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zaxpy_v2(handle, n, alpha, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1030,7 +1066,7 @@ pub unsafe extern "system" fn cublasCopyEx(
     yType: cudaDataType,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::copy_ex(handle, n, x, xType, incx, y, yType, incy)
 }
 
 #[no_mangle]
@@ -1042,7 +1078,7 @@ pub unsafe extern "system" fn cublasScopy_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::scopy_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1054,7 +1090,7 @@ pub unsafe extern "system" fn cublasDcopy_v2(
     y: *mut f64,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dcopy_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1066,7 +1102,7 @@ pub unsafe extern "system" fn cublasCcopy_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ccopy_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1078,7 +1114,7 @@ pub unsafe extern "system" fn cublasZcopy_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zcopy_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1090,7 +1126,7 @@ pub unsafe extern "system" fn cublasSswap_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sswap_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1114,7 +1150,7 @@ pub unsafe extern "system" fn cublasCswap_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cswap_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1126,7 +1162,7 @@ pub unsafe extern "system" fn cublasZswap_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zswap_v2(handle, n, x, incx, y, incy)
 }
 
 #[no_mangle]
@@ -1140,7 +1176,7 @@ pub unsafe extern "system" fn cublasSwapEx(
     yType: cudaDataType,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::swap_ex(handle, n, x, xType, incx, y, yType, incy)
 }
 
 #[no_mangle]
@@ -1151,7 +1187,7 @@ pub unsafe extern "system" fn cublasIsamax_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::isamax_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1173,7 +1209,7 @@ pub unsafe extern "system" fn cublasIcamax_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::icamax_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1184,7 +1220,7 @@ pub unsafe extern "system" fn cublasIzamax_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::izamax_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1196,7 +1232,7 @@ pub unsafe extern "system" fn cublasIamaxEx(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::iamax_ex(handle, n, x, xType, incx, result)
 }
 
 #[no_mangle]
@@ -1207,7 +1243,7 @@ pub unsafe extern "system" fn cublasIsamin_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::isamin_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1218,7 +1254,7 @@ pub unsafe extern "system" fn cublasIdamin_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::idamin_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1229,7 +1265,7 @@ pub unsafe extern "system" fn cublasIcamin_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::icamin_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1240,7 +1276,7 @@ pub unsafe extern "system" fn cublasIzamin_v2(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::izamin_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1252,7 +1288,7 @@ pub unsafe extern "system" fn cublasIaminEx(
     incx: ::std::os::raw::c_int,
     result: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::iamin_ex(handle, n, x, xType, incx, result)
 }
 
 #[no_mangle]
@@ -1266,7 +1302,7 @@ pub unsafe extern "system" fn cublasAsumEx(
     resultType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::asum_ex(handle, n, x, xType, incx, result, resultType, executiontype)
 }
 
 #[no_mangle]
@@ -1277,7 +1313,7 @@ pub unsafe extern "system" fn cublasSasum_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sasum_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1299,7 +1335,7 @@ pub unsafe extern "system" fn cublasScasum_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::scasum_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1310,7 +1346,7 @@ pub unsafe extern "system" fn cublasDzasum_v2(
     incx: ::std::os::raw::c_int,
     result: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dzasum_v2(handle, n, x, incx, result)
 }
 
 #[no_mangle]
@@ -1324,7 +1360,7 @@ pub unsafe extern "system" fn cublasSrot_v2(
     c: *const f32,
     s: *const f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::srot_v2(handle, n, x, incx, y, incy, c, s)
 }
 
 #[no_mangle]
@@ -1352,7 +1388,7 @@ pub unsafe extern "system" fn cublasCrot_v2(
     c: *const f32,
     s: *const cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::crot_v2(handle, n, x, incx, y, incy, c, s)
 }
 
 #[no_mangle]
@@ -1366,7 +1402,7 @@ pub unsafe extern "system" fn cublasCsrot_v2(
     c: *const f32,
     s: *const f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csrot_v2(handle, n, x, incx, y, incy, c, s)
 }
 
 #[no_mangle]
@@ -1380,7 +1416,7 @@ pub unsafe extern "system" fn cublasZrot_v2(
     c: *const f64,
     s: *const cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zrot_v2(handle, n, x, incx, y, incy, c, s)
 }
 
 #[no_mangle]
@@ -1394,7 +1430,7 @@ pub unsafe extern "system" fn cublasZdrot_v2(
     c: *const f64,
     s: *const f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zdrot_v2(handle, n, x, incx, y, incy, c, s)
 }
 
 #[no_mangle]
@@ -1412,7 +1448,20 @@ pub unsafe extern "system" fn cublasRotEx(
     csType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::rot_ex(
+        handle,
+        n,
+        x,
+        xType,
+        incx,
+        y,
+        yType,
+        incy,
+        c,
+        s,
+        csType,
+        executiontype,
+    )
 }
 
 #[no_mangle]
@@ -1423,7 +1472,7 @@ pub unsafe extern "system" fn cublasSrotg_v2(
     c: *mut f32,
     s: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::srotg_v2(handle, a, b, c, s)
 }
 
 #[no_mangle]
@@ -1445,7 +1494,7 @@ pub unsafe extern "system" fn cublasCrotg_v2(
     c: *mut f32,
     s: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::crotg_v2(handle, a, b, c, s)
 }
 
 #[no_mangle]
@@ -1456,7 +1505,7 @@ pub unsafe extern "system" fn cublasZrotg_v2(
     c: *mut f64,
     s: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zrotg_v2(handle, a, b, c, s)
 }
 
 #[no_mangle]
@@ -1470,7 +1519,7 @@ pub unsafe extern "system" fn cublasRotgEx(
     csType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::rotg_ex(handle, a, b, abType, c, s, csType, executiontype)
 }
 
 #[no_mangle]
@@ -1483,7 +1532,7 @@ pub unsafe extern "system" fn cublasSrotm_v2(
     incy: ::std::os::raw::c_int,
     param: *const f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::srotm_v2(handle, n, x, incx, y, incy, param)
 }
 
 #[no_mangle]
@@ -1513,7 +1562,19 @@ pub unsafe extern "system" fn cublasRotmEx(
     paramType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::rotm_ex(
+        handle,
+        n,
+        x,
+        xType,
+        incx,
+        y,
+        yType,
+        incy,
+        param,
+        paramType,
+        executiontype,
+    )
 }
 
 #[no_mangle]
@@ -1525,7 +1586,7 @@ pub unsafe extern "system" fn cublasSrotmg_v2(
     y1: *const f32,
     param: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::srotmg_v2(handle, d1, d2, x1, y1, param)
 }
 
 #[no_mangle]
@@ -1555,7 +1616,20 @@ pub unsafe extern "system" fn cublasRotmgEx(
     paramType: cudaDataType,
     executiontype: cudaDataType,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::rotmg_ex(
+        handle,
+        d1,
+        d1Type,
+        d2,
+        d2Type,
+        x1,
+        x1Type,
+        y1,
+        y1Type,
+        param,
+        paramType,
+        executiontype,
+    )
 }
 
 #[no_mangle]
@@ -1609,7 +1683,7 @@ pub unsafe extern "system" fn cublasCgemv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemv_v2(handle, trans, m, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -1627,7 +1701,7 @@ pub unsafe extern "system" fn cublasZgemv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemv_v2(handle, trans, m, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -1647,7 +1721,9 @@ pub unsafe extern "system" fn cublasSgbmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgbmv_v2(
+        handle, trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy,
+    )
 }
 
 #[no_mangle]
@@ -1667,7 +1743,9 @@ pub unsafe extern "system" fn cublasDgbmv_v2(
     y: *mut f64,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgbmv_v2(
+        handle, trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy,
+    )
 }
 
 #[no_mangle]
@@ -1687,7 +1765,9 @@ pub unsafe extern "system" fn cublasCgbmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgbmv_v2(
+        handle, trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy,
+    )
 }
 
 #[no_mangle]
@@ -1707,7 +1787,9 @@ pub unsafe extern "system" fn cublasZgbmv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgbmv_v2(
+        handle, trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy,
+    )
 }
 
 #[no_mangle]
@@ -1722,7 +1804,7 @@ pub unsafe extern "system" fn cublasStrmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strmv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1737,7 +1819,7 @@ pub unsafe extern "system" fn cublasDtrmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtrmv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1752,7 +1834,7 @@ pub unsafe extern "system" fn cublasCtrmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrmv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1767,7 +1849,7 @@ pub unsafe extern "system" fn cublasZtrmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrmv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1783,7 +1865,7 @@ pub unsafe extern "system" fn cublasStbmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::stbmv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1799,7 +1881,7 @@ pub unsafe extern "system" fn cublasDtbmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtbmv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1815,7 +1897,7 @@ pub unsafe extern "system" fn cublasCtbmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctbmv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1831,7 +1913,7 @@ pub unsafe extern "system" fn cublasZtbmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztbmv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1845,7 +1927,7 @@ pub unsafe extern "system" fn cublasStpmv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::stpmv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1859,7 +1941,7 @@ pub unsafe extern "system" fn cublasDtpmv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtpmv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1873,7 +1955,7 @@ pub unsafe extern "system" fn cublasCtpmv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctpmv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1887,7 +1969,7 @@ pub unsafe extern "system" fn cublasZtpmv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztpmv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1902,7 +1984,7 @@ pub unsafe extern "system" fn cublasStrsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strsv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1917,7 +1999,7 @@ pub unsafe extern "system" fn cublasDtrsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtrsv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1932,7 +2014,7 @@ pub unsafe extern "system" fn cublasCtrsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrsv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1947,7 +2029,7 @@ pub unsafe extern "system" fn cublasZtrsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrsv_v2(handle, uplo, trans, diag, n, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -1961,7 +2043,7 @@ pub unsafe extern "system" fn cublasStpsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::stpsv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1975,7 +2057,7 @@ pub unsafe extern "system" fn cublasDtpsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtpsv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -1989,7 +2071,7 @@ pub unsafe extern "system" fn cublasCtpsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctpsv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -2003,7 +2085,7 @@ pub unsafe extern "system" fn cublasZtpsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztpsv_v2(handle, uplo, trans, diag, n, AP, x, incx)
 }
 
 #[no_mangle]
@@ -2019,7 +2101,7 @@ pub unsafe extern "system" fn cublasStbsv_v2(
     x: *mut f32,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::stbsv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -2035,7 +2117,7 @@ pub unsafe extern "system" fn cublasDtbsv_v2(
     x: *mut f64,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtbsv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -2051,7 +2133,7 @@ pub unsafe extern "system" fn cublasCtbsv_v2(
     x: *mut cuComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctbsv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -2067,7 +2149,7 @@ pub unsafe extern "system" fn cublasZtbsv_v2(
     x: *mut cuDoubleComplex,
     incx: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztbsv_v2(handle, uplo, trans, diag, n, k, A, lda, x, incx)
 }
 
 #[no_mangle]
@@ -2084,7 +2166,7 @@ pub unsafe extern "system" fn cublasSsymv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssymv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2101,7 +2183,7 @@ pub unsafe extern "system" fn cublasDsymv_v2(
     y: *mut f64,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsymv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2118,7 +2200,7 @@ pub unsafe extern "system" fn cublasCsymv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csymv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2135,7 +2217,7 @@ pub unsafe extern "system" fn cublasZsymv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsymv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2152,7 +2234,7 @@ pub unsafe extern "system" fn cublasChemv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chemv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2169,7 +2251,7 @@ pub unsafe extern "system" fn cublasZhemv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhemv_v2(handle, uplo, n, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2187,7 +2269,7 @@ pub unsafe extern "system" fn cublasSsbmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssbmv_v2(handle, uplo, n, k, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2205,7 +2287,7 @@ pub unsafe extern "system" fn cublasDsbmv_v2(
     y: *mut f64,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsbmv_v2(handle, uplo, n, k, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2223,7 +2305,7 @@ pub unsafe extern "system" fn cublasChbmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chbmv_v2(handle, uplo, n, k, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2241,7 +2323,7 @@ pub unsafe extern "system" fn cublasZhbmv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhbmv_v2(handle, uplo, n, k, alpha, A, lda, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2257,7 +2339,7 @@ pub unsafe extern "system" fn cublasSspmv_v2(
     y: *mut f32,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sspmv_v2(handle, uplo, n, alpha, AP, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2273,7 +2355,7 @@ pub unsafe extern "system" fn cublasDspmv_v2(
     y: *mut f64,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dspmv_v2(handle, uplo, n, alpha, AP, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2289,7 +2371,7 @@ pub unsafe extern "system" fn cublasChpmv_v2(
     y: *mut cuComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chpmv_v2(handle, uplo, n, alpha, AP, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2305,7 +2387,7 @@ pub unsafe extern "system" fn cublasZhpmv_v2(
     y: *mut cuDoubleComplex,
     incy: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhpmv_v2(handle, uplo, n, alpha, AP, x, incx, beta, y, incy)
 }
 
 #[no_mangle]
@@ -2321,7 +2403,7 @@ pub unsafe extern "system" fn cublasSger_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sger_v2(handle, m, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2353,7 +2435,7 @@ pub unsafe extern "system" fn cublasCgeru_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgeru_v2(handle, m, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2369,7 +2451,7 @@ pub unsafe extern "system" fn cublasCgerc_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgerc_v2(handle, m, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2385,7 +2467,7 @@ pub unsafe extern "system" fn cublasZgeru_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgeru_v2(handle, m, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2401,7 +2483,7 @@ pub unsafe extern "system" fn cublasZgerc_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgerc_v2(handle, m, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2415,7 +2497,7 @@ pub unsafe extern "system" fn cublasSsyr_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssyr_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2429,7 +2511,7 @@ pub unsafe extern "system" fn cublasDsyr_v2(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsyr_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2443,7 +2525,7 @@ pub unsafe extern "system" fn cublasCsyr_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyr_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2457,7 +2539,7 @@ pub unsafe extern "system" fn cublasZsyr_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsyr_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2471,7 +2553,7 @@ pub unsafe extern "system" fn cublasCher_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cher_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2485,7 +2567,7 @@ pub unsafe extern "system" fn cublasZher_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zher_v2(handle, uplo, n, alpha, x, incx, A, lda)
 }
 
 #[no_mangle]
@@ -2498,7 +2580,7 @@ pub unsafe extern "system" fn cublasSspr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sspr_v2(handle, uplo, n, alpha, x, incx, AP)
 }
 
 #[no_mangle]
@@ -2511,7 +2593,7 @@ pub unsafe extern "system" fn cublasDspr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dspr_v2(handle, uplo, n, alpha, x, incx, AP)
 }
 
 #[no_mangle]
@@ -2524,7 +2606,7 @@ pub unsafe extern "system" fn cublasChpr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chpr_v2(handle, uplo, n, alpha, x, incx, AP)
 }
 
 #[no_mangle]
@@ -2537,7 +2619,7 @@ pub unsafe extern "system" fn cublasZhpr_v2(
     incx: ::std::os::raw::c_int,
     AP: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhpr_v2(handle, uplo, n, alpha, x, incx, AP)
 }
 
 #[no_mangle]
@@ -2553,7 +2635,7 @@ pub unsafe extern "system" fn cublasSsyr2_v2(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssyr2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2569,7 +2651,7 @@ pub unsafe extern "system" fn cublasDsyr2_v2(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsyr2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2585,7 +2667,7 @@ pub unsafe extern "system" fn cublasCsyr2_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyr2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2601,7 +2683,7 @@ pub unsafe extern "system" fn cublasZsyr2_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsyr2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2617,7 +2699,7 @@ pub unsafe extern "system" fn cublasCher2_v2(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cher2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2633,7 +2715,7 @@ pub unsafe extern "system" fn cublasZher2_v2(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zher2_v2(handle, uplo, n, alpha, x, incx, y, incy, A, lda)
 }
 
 #[no_mangle]
@@ -2648,7 +2730,7 @@ pub unsafe extern "system" fn cublasSspr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sspr2_v2(handle, uplo, n, alpha, x, incx, y, incy, AP)
 }
 
 #[no_mangle]
@@ -2663,7 +2745,7 @@ pub unsafe extern "system" fn cublasDspr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dspr2_v2(handle, uplo, n, alpha, x, incx, y, incy, AP)
 }
 
 #[no_mangle]
@@ -2678,7 +2760,7 @@ pub unsafe extern "system" fn cublasChpr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chpr2_v2(handle, uplo, n, alpha, x, incx, y, incy, AP)
 }
 
 #[no_mangle]
@@ -2693,7 +2775,7 @@ pub unsafe extern "system" fn cublasZhpr2_v2(
     incy: ::std::os::raw::c_int,
     AP: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhpr2_v2(handle, uplo, n, alpha, x, incx, y, incy, AP)
 }
 
 #[no_mangle]
@@ -2712,7 +2794,9 @@ pub unsafe extern "system" fn cublasSgemvBatched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgemv_batched(
+        handle, trans, m, n, alpha, Aarray, lda, xarray, incx, beta, yarray, incy, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2731,7 +2815,9 @@ pub unsafe extern "system" fn cublasDgemvBatched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgemv_batched(
+        handle, trans, m, n, alpha, Aarray, lda, xarray, incx, beta, yarray, incy, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2750,7 +2836,9 @@ pub unsafe extern "system" fn cublasCgemvBatched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemv_batched(
+        handle, trans, m, n, alpha, Aarray, lda, xarray, incx, beta, yarray, incy, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2769,7 +2857,9 @@ pub unsafe extern "system" fn cublasZgemvBatched(
     incy: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemv_batched(
+        handle, trans, m, n, alpha, Aarray, lda, xarray, incx, beta, yarray, incy, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2791,7 +2881,10 @@ pub unsafe extern "system" fn cublasSgemvStridedBatched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgemv_strided_batched(
+        handle, trans, m, n, alpha, A, lda, strideA, x, incx, stridex, beta, y, incy, stridey,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2813,7 +2906,10 @@ pub unsafe extern "system" fn cublasDgemvStridedBatched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgemv_strided_batched(
+        handle, trans, m, n, alpha, A, lda, strideA, x, incx, stridex, beta, y, incy, stridey,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2835,7 +2931,10 @@ pub unsafe extern "system" fn cublasCgemvStridedBatched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemv_strided_batched(
+        handle, trans, m, n, alpha, A, lda, strideA, x, incx, stridex, beta, y, incy, stridey,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2857,7 +2956,10 @@ pub unsafe extern "system" fn cublasZgemvStridedBatched(
     stridey: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemv_strided_batched(
+        handle, trans, m, n, alpha, A, lda, strideA, x, incx, stridex, beta, y, incy, stridey,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -2921,7 +3023,9 @@ pub unsafe extern "system" fn cublasCgemm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm_v2(
+        handle, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -2941,7 +3045,9 @@ pub unsafe extern "system" fn cublasCgemm3m(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm3m(
+        handle, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -2964,7 +3070,9 @@ pub unsafe extern "system" fn cublasCgemm3mEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm3m_ex(
+        handle, transa, transb, m, n, k, alpha, A, Atype, lda, B, Btype, ldb, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -2984,7 +3092,9 @@ pub unsafe extern "system" fn cublasZgemm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemm_v2(
+        handle, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3004,7 +3114,9 @@ pub unsafe extern "system" fn cublasZgemm3m(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemm3m(
+        handle, transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3097,7 +3209,9 @@ pub unsafe extern "system" fn cublasCgemmEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm_ex(
+        handle, transa, transb, m, n, k, alpha, A, Atype, lda, B, Btype, ldb, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3121,7 +3235,10 @@ pub unsafe extern "system" fn cublasUint8gemmBias(
     C_mult: ::std::os::raw::c_int,
     C_shift: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::uint8gemm_bias(
+        handle, transa, transb, transc, m, n, k, A, A_bias, lda, B, B_bias, ldb, C, C_bias, ldc,
+        C_mult, C_shift,
+    )
 }
 
 #[no_mangle]
@@ -3138,7 +3255,7 @@ pub unsafe extern "system" fn cublasSsyrk_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssyrk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3155,7 +3272,7 @@ pub unsafe extern "system" fn cublasDsyrk_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsyrk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3172,7 +3289,7 @@ pub unsafe extern "system" fn cublasCsyrk_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyrk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3189,7 +3306,7 @@ pub unsafe extern "system" fn cublasZsyrk_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsyrk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3208,7 +3325,9 @@ pub unsafe extern "system" fn cublasCsyrkEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyrk_ex(
+        handle, uplo, trans, n, k, alpha, A, Atype, lda, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3227,7 +3346,9 @@ pub unsafe extern "system" fn cublasCsyrk3mEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyrk3m_ex(
+        handle, uplo, trans, n, k, alpha, A, Atype, lda, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3244,7 +3365,7 @@ pub unsafe extern "system" fn cublasCherk_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cherk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3261,7 +3382,7 @@ pub unsafe extern "system" fn cublasZherk_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zherk_v2(handle, uplo, trans, n, k, alpha, A, lda, beta, C, ldc)
 }
 
 #[no_mangle]
@@ -3280,7 +3401,9 @@ pub unsafe extern "system" fn cublasCherkEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cherk_ex(
+        handle, uplo, trans, n, k, alpha, A, Atype, lda, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3299,7 +3422,9 @@ pub unsafe extern "system" fn cublasCherk3mEx(
     Ctype: cudaDataType,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cherk3m_ex(
+        handle, uplo, trans, n, k, alpha, A, Atype, lda, beta, C, Ctype, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3318,7 +3443,9 @@ pub unsafe extern "system" fn cublasSsyr2k_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssyr2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3337,7 +3464,9 @@ pub unsafe extern "system" fn cublasDsyr2k_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsyr2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3356,7 +3485,9 @@ pub unsafe extern "system" fn cublasCsyr2k_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyr2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3375,7 +3506,9 @@ pub unsafe extern "system" fn cublasZsyr2k_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsyr2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3394,7 +3527,9 @@ pub unsafe extern "system" fn cublasCher2k_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cher2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3413,7 +3548,9 @@ pub unsafe extern "system" fn cublasZher2k_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zher2k_v2(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3432,7 +3569,9 @@ pub unsafe extern "system" fn cublasSsyrkx(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssyrkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3451,7 +3590,9 @@ pub unsafe extern "system" fn cublasDsyrkx(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsyrkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3470,7 +3611,9 @@ pub unsafe extern "system" fn cublasCsyrkx(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csyrkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3489,7 +3632,9 @@ pub unsafe extern "system" fn cublasZsyrkx(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsyrkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3508,7 +3653,9 @@ pub unsafe extern "system" fn cublasCherkx(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cherkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3527,7 +3674,9 @@ pub unsafe extern "system" fn cublasZherkx(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zherkx(
+        handle, uplo, trans, n, k, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3546,7 +3695,9 @@ pub unsafe extern "system" fn cublasSsymm_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ssymm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3565,7 +3716,9 @@ pub unsafe extern "system" fn cublasDsymm_v2(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dsymm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3584,7 +3737,9 @@ pub unsafe extern "system" fn cublasCsymm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::csymm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3603,7 +3758,9 @@ pub unsafe extern "system" fn cublasZsymm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zsymm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3622,7 +3779,9 @@ pub unsafe extern "system" fn cublasChemm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::chemm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3641,7 +3800,9 @@ pub unsafe extern "system" fn cublasZhemm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zhemm_v2(
+        handle, side, uplo, m, n, alpha, A, lda, B, ldb, beta, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3659,7 +3820,7 @@ pub unsafe extern "system" fn cublasStrsm_v2(
     B: *mut f32,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strsm_v2(handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb)
 }
 
 #[no_mangle]
@@ -3695,7 +3856,7 @@ pub unsafe extern "system" fn cublasCtrsm_v2(
     B: *mut cuComplex,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrsm_v2(handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb)
 }
 
 #[no_mangle]
@@ -3713,7 +3874,7 @@ pub unsafe extern "system" fn cublasZtrsm_v2(
     B: *mut cuDoubleComplex,
     ldb: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrsm_v2(handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb)
 }
 
 #[no_mangle]
@@ -3733,7 +3894,9 @@ pub unsafe extern "system" fn cublasStrmm_v2(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strmm_v2(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3775,7 +3938,9 @@ pub unsafe extern "system" fn cublasCtrmm_v2(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrmm_v2(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3795,7 +3960,9 @@ pub unsafe extern "system" fn cublasZtrmm_v2(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrmm_v2(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -3816,7 +3983,10 @@ pub unsafe extern "system" fn cublasSgemmBatched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgemm_batched(
+        handle, transa, transb, m, n, k, alpha, Aarray, lda, Barray, ldb, beta, Carray, ldc,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -3837,7 +4007,10 @@ pub unsafe extern "system" fn cublasDgemmBatched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgemm_batched(
+        handle, transa, transb, m, n, k, alpha, Aarray, lda, Barray, ldb, beta, Carray, ldc,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -3858,7 +4031,10 @@ pub unsafe extern "system" fn cublasCgemmBatched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm_batched(
+        handle, transa, transb, m, n, k, alpha, Aarray, lda, Barray, ldb, beta, Carray, ldc,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -3879,7 +4055,10 @@ pub unsafe extern "system" fn cublasCgemm3mBatched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm3m_batched(
+        handle, transa, transb, m, n, k, alpha, Aarray, lda, Barray, ldb, beta, Carray, ldc,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -3900,7 +4079,10 @@ pub unsafe extern "system" fn cublasZgemmBatched(
     ldc: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgemm_batched(
+        handle, transa, transb, m, n, k, alpha, Aarray, lda, Barray, ldb, beta, Carray, ldc,
+        batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4105,7 +4287,10 @@ pub unsafe extern "system" fn cublasCgemm3mStridedBatched(
     strideC: ::std::os::raw::c_longlong,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgemm3m_strided_batched(
+        handle, transa, transb, m, n, k, alpha, A, lda, strideA, B, ldb, strideB, beta, C, ldc,
+        strideC, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4151,7 +4336,9 @@ pub unsafe extern "system" fn cublasSgeam(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgeam(
+        handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -4170,7 +4357,9 @@ pub unsafe extern "system" fn cublasDgeam(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgeam(
+        handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -4189,7 +4378,9 @@ pub unsafe extern "system" fn cublasCgeam(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgeam(
+        handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -4208,7 +4399,9 @@ pub unsafe extern "system" fn cublasZgeam(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgeam(
+        handle, transa, transb, m, n, alpha, A, lda, beta, B, ldb, C, ldc,
+    )
 }
 
 #[no_mangle]
@@ -4221,7 +4414,7 @@ pub unsafe extern "system" fn cublasSgetrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgetrf_batched(handle, n, A, lda, P, info, batchSize)
 }
 
 #[no_mangle]
@@ -4234,7 +4427,7 @@ pub unsafe extern "system" fn cublasDgetrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgetrf_batched(handle, n, A, lda, P, info, batchSize)
 }
 
 #[no_mangle]
@@ -4275,7 +4468,7 @@ pub unsafe extern "system" fn cublasSgetriBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgetri_batched(handle, n, A, lda, P, C, ldc, info, batchSize)
 }
 
 #[no_mangle]
@@ -4290,7 +4483,7 @@ pub unsafe extern "system" fn cublasDgetriBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgetri_batched(handle, n, A, lda, P, C, ldc, info, batchSize)
 }
 
 #[no_mangle]
@@ -4337,7 +4530,9 @@ pub unsafe extern "system" fn cublasSgetrsBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgetrs_batched(
+        handle, trans, n, nrhs, Aarray, lda, devIpiv, Barray, ldb, info, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4354,7 +4549,9 @@ pub unsafe extern "system" fn cublasDgetrsBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgetrs_batched(
+        handle, trans, n, nrhs, Aarray, lda, devIpiv, Barray, ldb, info, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4371,7 +4568,9 @@ pub unsafe extern "system" fn cublasCgetrsBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgetrs_batched(
+        handle, trans, n, nrhs, Aarray, lda, devIpiv, Barray, ldb, info, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4388,7 +4587,9 @@ pub unsafe extern "system" fn cublasZgetrsBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgetrs_batched(
+        handle, trans, n, nrhs, Aarray, lda, devIpiv, Barray, ldb, info, batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4407,7 +4608,9 @@ pub unsafe extern "system" fn cublasStrsmBatched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strsm_batched(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4426,7 +4629,9 @@ pub unsafe extern "system" fn cublasDtrsmBatched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtrsm_batched(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4445,7 +4650,9 @@ pub unsafe extern "system" fn cublasCtrsmBatched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrsm_batched(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4464,7 +4671,9 @@ pub unsafe extern "system" fn cublasZtrsmBatched(
     ldb: ::std::os::raw::c_int,
     batchCount: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrsm_batched(
+        handle, side, uplo, trans, diag, m, n, alpha, A, lda, B, ldb, batchCount,
+    )
 }
 
 #[no_mangle]
@@ -4478,7 +4687,7 @@ pub unsafe extern "system" fn cublasSmatinvBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::smatinv_batched(handle, n, A, lda, Ainv, lda_inv, info, batchSize)
 }
 
 #[no_mangle]
@@ -4492,7 +4701,7 @@ pub unsafe extern "system" fn cublasDmatinvBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dmatinv_batched(handle, n, A, lda, Ainv, lda_inv, info, batchSize)
 }
 
 #[no_mangle]
@@ -4506,7 +4715,7 @@ pub unsafe extern "system" fn cublasCmatinvBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cmatinv_batched(handle, n, A, lda, Ainv, lda_inv, info, batchSize)
 }
 
 #[no_mangle]
@@ -4520,7 +4729,7 @@ pub unsafe extern "system" fn cublasZmatinvBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zmatinv_batched(handle, n, A, lda, Ainv, lda_inv, info, batchSize)
 }
 
 #[no_mangle]
@@ -4534,7 +4743,7 @@ pub unsafe extern "system" fn cublasSgeqrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgeqrf_batched(handle, m, n, Aarray, lda, TauArray, info, batchSize)
 }
 
 #[no_mangle]
@@ -4548,7 +4757,7 @@ pub unsafe extern "system" fn cublasDgeqrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgeqrf_batched(handle, m, n, Aarray, lda, TauArray, info, batchSize)
 }
 
 #[no_mangle]
@@ -4562,7 +4771,7 @@ pub unsafe extern "system" fn cublasCgeqrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgeqrf_batched(handle, m, n, Aarray, lda, TauArray, info, batchSize)
 }
 
 #[no_mangle]
@@ -4576,7 +4785,7 @@ pub unsafe extern "system" fn cublasZgeqrfBatched(
     info: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgeqrf_batched(handle, m, n, Aarray, lda, TauArray, info, batchSize)
 }
 
 #[no_mangle]
@@ -4594,7 +4803,20 @@ pub unsafe extern "system" fn cublasSgelsBatched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sgels_batched(
+        handle,
+        trans,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        info,
+        devInfoArray,
+        batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4612,7 +4834,20 @@ pub unsafe extern "system" fn cublasDgelsBatched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dgels_batched(
+        handle,
+        trans,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        info,
+        devInfoArray,
+        batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4630,7 +4865,20 @@ pub unsafe extern "system" fn cublasCgelsBatched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cgels_batched(
+        handle,
+        trans,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        info,
+        devInfoArray,
+        batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4648,7 +4896,20 @@ pub unsafe extern "system" fn cublasZgelsBatched(
     devInfoArray: *mut ::std::os::raw::c_int,
     batchSize: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zgels_batched(
+        handle,
+        trans,
+        m,
+        n,
+        nrhs,
+        Aarray,
+        lda,
+        Carray,
+        ldc,
+        info,
+        devInfoArray,
+        batchSize,
+    )
 }
 
 #[no_mangle]
@@ -4664,7 +4925,7 @@ pub unsafe extern "system" fn cublasSdgmm(
     C: *mut f32,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::sdgmm(handle, mode, m, n, A, lda, x, incx, C, ldc)
 }
 
 #[no_mangle]
@@ -4680,7 +4941,7 @@ pub unsafe extern "system" fn cublasDdgmm(
     C: *mut f64,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ddgmm(handle, mode, m, n, A, lda, x, incx, C, ldc)
 }
 
 #[no_mangle]
@@ -4696,7 +4957,7 @@ pub unsafe extern "system" fn cublasCdgmm(
     C: *mut cuComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::cdgmm(handle, mode, m, n, A, lda, x, incx, C, ldc)
 }
 
 #[no_mangle]
@@ -4712,7 +4973,7 @@ pub unsafe extern "system" fn cublasZdgmm(
     C: *mut cuDoubleComplex,
     ldc: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::zdgmm(handle, mode, m, n, A, lda, x, incx, C, ldc)
 }
 
 #[no_mangle]
@@ -4724,7 +4985,7 @@ pub unsafe extern "system" fn cublasStpttr(
     A: *mut f32,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::stpttr(handle, uplo, n, AP, A, lda)
 }
 
 #[no_mangle]
@@ -4736,7 +4997,7 @@ pub unsafe extern "system" fn cublasDtpttr(
     A: *mut f64,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtpttr(handle, uplo, n, AP, A, lda)
 }
 
 #[no_mangle]
@@ -4748,7 +5009,7 @@ pub unsafe extern "system" fn cublasCtpttr(
     A: *mut cuComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctpttr(handle, uplo, n, AP, A, lda)
 }
 
 #[no_mangle]
@@ -4760,7 +5021,7 @@ pub unsafe extern "system" fn cublasZtpttr(
     A: *mut cuDoubleComplex,
     lda: ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztpttr(handle, uplo, n, AP, A, lda)
 }
 
 #[no_mangle]
@@ -4772,7 +5033,7 @@ pub unsafe extern "system" fn cublasStrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut f32,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::strttp(handle, uplo, n, A, lda, AP)
 }
 
 #[no_mangle]
@@ -4784,7 +5045,7 @@ pub unsafe extern "system" fn cublasDtrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut f64,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::dtrttp(handle, uplo, n, A, lda, AP)
 }
 
 #[no_mangle]
@@ -4796,7 +5057,7 @@ pub unsafe extern "system" fn cublasCtrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut cuComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ctrttp(handle, uplo, n, A, lda, AP)
 }
 
 #[no_mangle]
@@ -4808,7 +5069,7 @@ pub unsafe extern "system" fn cublasZtrttp(
     lda: ::std::os::raw::c_int,
     AP: *mut cuDoubleComplex,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    crate::ztrttp(handle, uplo, n, A, lda, AP)
 }
 
 #[no_mangle]
@@ -4818,19 +5079,19 @@ pub unsafe extern "system" fn cublasInit() -> cublasStatus_t {
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasShutdown() -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasGetError() -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasGetVersion(
     version: *mut ::std::os::raw::c_int,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
@@ -4839,17 +5100,17 @@ pub unsafe extern "system" fn cublasAlloc(
     elemSize: ::std::os::raw::c_int,
     devicePtr: *mut *mut ::std::os::raw::c_void,
 ) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasFree(devicePtr: *mut ::std::os::raw::c_void) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cublasSetKernelStream(stream: cudaStream_t) -> cublasStatus_t {
-    crate::unsupported()
+    cublasStatus_t::CUBLAS_STATUS_NOT_SUPPORTED
 }
 
 #[no_mangle]

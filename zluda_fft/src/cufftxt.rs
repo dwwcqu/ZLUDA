@@ -201,7 +201,7 @@ pub unsafe extern "system" fn cufftXtSetGPUs(
     nGPUs: ::std::os::raw::c_int,
     whichGPUs: *mut ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_SUCCESS
 }
 
 #[no_mangle]
@@ -210,7 +210,7 @@ pub unsafe extern "system" fn cufftXtMalloc(
     descriptor: *mut *mut cudaLibXtDesc,
     format: cufftXtSubFormat,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -220,12 +220,12 @@ pub unsafe extern "system" fn cufftXtMemcpy(
     srcPointer: *mut ::std::os::raw::c_void,
     type_: cufftXtCopyType,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
 pub unsafe extern "system" fn cufftXtFree(descriptor: *mut cudaLibXtDesc) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -233,7 +233,7 @@ pub unsafe extern "system" fn cufftXtSetWorkArea(
     plan: cufftHandle,
     workArea: *mut *mut ::std::os::raw::c_void,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -243,7 +243,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorC2C(
     output: *mut cudaLibXtDesc,
     direction: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -252,7 +252,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorR2C(
     input: *mut cudaLibXtDesc,
     output: *mut cudaLibXtDesc,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -261,7 +261,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorC2R(
     input: *mut cudaLibXtDesc,
     output: *mut cudaLibXtDesc,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -271,7 +271,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorZ2Z(
     output: *mut cudaLibXtDesc,
     direction: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -280,7 +280,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorD2Z(
     input: *mut cudaLibXtDesc,
     output: *mut cudaLibXtDesc,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -289,7 +289,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptorZ2D(
     input: *mut cudaLibXtDesc,
     output: *mut cudaLibXtDesc,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -406,7 +406,7 @@ pub unsafe extern "system" fn cufftXtExec(
     output: *mut ::std::os::raw::c_void,
     direction: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]
@@ -416,7 +416,7 @@ pub unsafe extern "system" fn cufftXtExecDescriptor(
     output: *mut cudaLibXtDesc,
     direction: ::std::os::raw::c_int,
 ) -> cufftResult {
-    crate::unsupported()
+    cufftResult::CUFFT_NOT_IMPLEMENTED
 }
 
 #[no_mangle]

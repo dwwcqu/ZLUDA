@@ -853,6 +853,10 @@ name = "hipfft-sys"
 version = "0.0.0"
 
 [[package]]
+name = "hiprand-sys"
+version = "0.0.0"
+
+[[package]]
 name = "hiprt-sys"
 version = "0.0.0"
 dependencies = [
@@ -860,6 +864,10 @@ dependencies = [
  "widestring 1.0.2",
  "winapi",
 ]
+
+[[package]]
+name = "hipsolver-sys"
+version = "0.0.0"
 
 [[package]]
 name = "iana-time-zone"
@@ -2369,6 +2377,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "zluda-solver"
+version = "0.0.0"
+dependencies = [
+ "cuda_types",
+ "hip_common",
+ "hipsolver-sys",
+ "zluda_dark_api",
+]
+
+[[package]]
 name = "zluda_api"
 version = "0.0.0"
 dependencies = [
@@ -2505,6 +2523,16 @@ version = "0.0.0"
 dependencies = [
  "atiadlxx-sys",
  "rocm_smi-sys",
+]
+
+[[package]]
+name = "zluda_rand"
+version = "0.0.0"
+dependencies = [
+ "cuda_types",
+ "hip_common",
+ "hiprand-sys",
+ "zluda_dark_api",
 ]
 
 [[package]]
